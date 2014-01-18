@@ -113,9 +113,9 @@
     <ClCompile Include="..\src\TestApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\DeferredRenderer.h" />
-    <ClInclude Include="..\include\PointLight.h" />
     <ClInclude Include="..\include\Resources.h" />
+    <ClInclude Include="..\src\DeferredRenderer.h" />
+    <ClInclude Include="..\src\PointLight.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

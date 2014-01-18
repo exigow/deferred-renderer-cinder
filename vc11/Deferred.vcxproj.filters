@@ -1,22 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="..\src\TestApp.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\DeferredRenderer.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\src\PointLight.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\TestApp.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Resources.h" />
-    <ClInclude Include="..\include\DeferredRenderer.h">
+    <ClInclude Include="..\src\DeferredRenderer.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\PointLight.h">
+    <ClInclude Include="..\src\PointLight.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
