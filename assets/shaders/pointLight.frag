@@ -27,8 +27,8 @@ void main() {
 	vec3 albedo = texture2D(albedoAndDepthMap, uv).rgb;
 	vec3 normal = texture2D(normalMap, uv).rgb;
 
-	vec3 h = normalize(localPosition + normalize(cameraPosition - position));
-	float phong = .25f * pow(max(dot(h, normal), 0.0), 64.0);
+	//vec3 h = normalize(localPosition + normalize(cameraPosition - position));
+	//float phong = .25f * pow(max(dot(h, normal), 0.0), 64.0);
 
-	gl_FragColor = vec4(strength * lightColor + phong, 1);
+	gl_FragColor = vec4(strength * lightColor, 1); //  + phong
 }

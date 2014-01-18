@@ -133,27 +133,6 @@ void TestApp::update() {
 		
 		testBoxList[i]->light->setPosition(x, y, z);
 	}
-
-	//btCollisionObject* obj;
-	//btRigidBody* body;
-	//for (int i = rigidCount - 1; i >= 0; --i) {
-		//btCollisionObject* obj = bullet::getWorld()->getCollisionObjectArray()[i];
-		//btRigidBody* body = btRigidBody::upcast(obj);
-		//body->getMotionState()->getWorldTransform();
-		/*
-		// get rigid body
-		btCollisionObject* obj = bullet::getWorld()->getCollisionObjectArray()[i];
-		btRigidBody* body = btRigidBody::upcast(obj);
-		if (body && body->getMotionState())
-		{
-			// get the body transformations
-			btTransform trans;
-			body->getMotionState()->getWorldTransform(trans);
-
-			if( trans.getOrigin().length() > 200.0f )
-				bullet::getWorld()->removeRigidBody( body );
-		}*/
-	//}
 }
 
 // toString.
@@ -234,7 +213,7 @@ void TestApp::keyDown(KeyEvent event) {
 			bullet::getWorld()->addRigidBody(boxShape->getRigidBody().get());
 			ref->light = new PointLight();
 			deferredRenderer->lightList.push_back(ref->light);
-			//ref->light->setRadius(64.0f);
+			ref->light->setRadius(24.0f);
 			//ref->light->setColor(1.0f, 1.0f, 1.0f);
 			//ref->light->setPosition(0.0f, 0.0f, 0.0f);
 			testBoxList.push_back(ref);
