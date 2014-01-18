@@ -16,8 +16,6 @@ void DeferredRenderer::setCamera(CameraPersp *camera) {
 }
 
 void DeferredRenderer::setup(int width, int height) {
-	setOutput(LIGHTS);
-
 	deferredFBOFormat.setColorInternalFormat(GL_RGBA16F_ARB);
 	deferredFBOFormat.enableColorBuffer(true, 3);
 	deferredFBOFormat.setSamples(0);
@@ -32,12 +30,6 @@ void DeferredRenderer::setup(int width, int height) {
 	lightFBOFormat.setCoverageSamples(0);
 	lightFBO = gl::Fbo(width, height, lightFBOFormat);
 		lightFBO.getTexture(0).setFlipped(true);
-
-	outputFBOFormat.setColorInternalFormat(GL_RGBA8);
-	outputFBOFormat.setSamples(0);
-	outputFBOFormat.setCoverageSamples(0);
-	outputFBO = gl::Fbo(width, height, outputFBOFormat);
-		outputFBO.getTexture(0).setFlipped(true);
 }
 
 void DeferredRenderer::renderLights() {
@@ -48,9 +40,9 @@ void DeferredRenderer::renderLights() {
 	gl::setViewport(lightFBO.getBounds());
 	pointLightShader->bind();
 
-		pointLightShader->uniform("frag0", 0);
-		pointLightShader->uniform("frag1", 1);
-		pointLightShader->uniform("frag2", 2);
+		pointLightShader->uniform("albedoAndDepthMap", 0);
+		pointLightShader->uniform("normalMap", 1);
+		pointLightShader->uniform("positionMap", 2);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
@@ -76,24 +68,6 @@ void DeferredRenderer::renderLights() {
 		glDisable(GL_BLEND);
 
 	pointLightShader->unbind();
-}
-
-void DeferredRenderer::renderOutput() {
-	gl::setViewport(outputFBO.getBounds());
-	
-	outputFBO.bindFramebuffer();
-		gl::clear(Color::black());
-		switch (output) {
-			case LIGHTS: {
-				gl::draw(lightFBO.getTexture(0), Rectf(0, 0, 1280, 600));
-				break;
-			}
-		}
-	outputFBO.unbindFramebuffer();
-}
-
-void DeferredRenderer::setOutput(enum Output what) {
-	this->output = what;
 }
 
 void DeferredRenderer::drawQuad() {

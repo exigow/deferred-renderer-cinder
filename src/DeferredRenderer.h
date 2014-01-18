@@ -8,6 +8,7 @@
 #include "PointLight.h"
 
 #include <vector>
+#include <string>
 
 using namespace ci;
 
@@ -18,28 +19,19 @@ public:
 	DeferredRenderer(int w, int h);
 	~DeferredRenderer();
 	
-	gl::GlslProg *pointLightShader, *deferredShader, *deferredPreviewShader;
-	gl::Fbo deferredFBO, lightFBO, outputFBO;
-	gl::Fbo::Format deferredFBOFormat, lightFBOFormat, outputFBOFormat;
+	gl::GlslProg *pointLightShader, *deferredShader;
+	gl::Fbo deferredFBO, lightFBO;
+	gl::Fbo::Format deferredFBOFormat, lightFBOFormat;
 
 	std::vector<PointLight*> lightList;
 
 	void setCamera(CameraPersp *camera);
 	void renderLights();
 
-	enum Output {
-		LIGHTS = 0,
-		ALBEDO = 1
-	};
-	void setOutput(enum Output optput);
-	void renderOutput();
-
 private:
 	void setup(int width, int height);
 	CameraPersp *camera;
 	void drawQuad();
-
-	Output output;
 };
 
 	

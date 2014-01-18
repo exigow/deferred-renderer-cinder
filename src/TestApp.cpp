@@ -78,11 +78,10 @@ void TestApp::resetCamera() {
 void TestApp::setup() {
 	deferredRenderer = new DeferredRenderer(1280, 600);
 	deferredRenderer->setCamera(&mCamera);
-	deferredRenderer->deferredShader = new gl::GlslProg(loadAsset("deferred.vert"), loadAsset("deferred.frag")); 
-	deferredRenderer->deferredPreviewShader = new gl::GlslProg(loadAsset("deferredPreview.vert"), loadAsset("deferredPreview.frag")); 
-	deferredRenderer->pointLightShader = new gl::GlslProg(loadAsset("light.vert"), loadAsset("light.frag")); 
+	deferredRenderer->deferredShader = new gl::GlslProg(loadAsset("shaders/deferred.vert"), loadAsset("shaders/deferred.frag")); 
+	deferredRenderer->pointLightShader = new gl::GlslProg(loadAsset("shaders/pointLight.vert"), loadAsset("shaders/pointLight.frag")); 
 
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < 4; i++) {
 		deferredRenderer->lightList.push_back(new PointLight());
 	}
 
@@ -129,11 +128,10 @@ void TestApp::draw() {
 	deferredRenderer->deferredFBO.unbindFramebuffer();
 
 	deferredRenderer->renderLights();
-	deferredRenderer->renderOutput();
 
 	gl::setViewport(viewport);
 	gl::pushMatrices();
-		gl::draw(deferredRenderer->outputFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
+		gl::draw(deferredRenderer->lightFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
 	gl::popMatrices();
 
 	gl::enableAlphaBlending();

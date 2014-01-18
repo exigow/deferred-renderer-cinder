@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<shaders>
+	<shader name="deferred" vertex="deferred.vert" fragment="deferred.frag">
+	<shader name="pointLight" vertex="pointLight.vert" fragment="pointLight.frag">
+</shaders>
