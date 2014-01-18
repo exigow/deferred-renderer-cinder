@@ -8,7 +8,6 @@
 #include "PointLight.h"
 
 #include <vector>
-#include <string>
 
 using namespace ci;
 

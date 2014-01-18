@@ -44,6 +44,8 @@ void DeferredRenderer::renderLights() {
 		pointLightShader->uniform("normalMap", 1);
 		pointLightShader->uniform("positionMap", 2);
 
+		pointLightShader->uniform("cameraPosition", camera->getEyePoint());
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
 
@@ -53,7 +55,7 @@ void DeferredRenderer::renderLights() {
 			gl::pushMatrices();
 				gl::setMatrices(*camera);
 				for (size_t i = 0; i < lightList.size(); i++) {
-					pointLightShader->uniform("lightPosition", (*camera).getModelViewMatrix().transformPointAffine(lightList[i]->getPosition()));
+					pointLightShader->uniform("lightPosition", camera->getModelViewMatrix().transformPointAffine(lightList[i]->getPosition()));
 					pointLightShader->uniform("lightRadius", lightList[i]->getRadius() * .5f);
 					pointLightShader->uniform("lightColor", lightList[i]->getColor());
 					gl::drawCube(lightList[i]->getPosition(), Vec3f(

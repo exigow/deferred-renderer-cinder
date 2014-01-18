@@ -14,16 +14,21 @@
 #include "cinder/gl/Fbo.h"
 #include "cinder/gl/GlslProg.h"
 #include "cinder/gl/Texture.h"
+#include "cinder/Rand.h"
 
 #include <math.h>
 #include <string>
 
 #include "PointLight.h"
 #include "DeferredRenderer.h"
+#include "TestBox.h"
+
+#include "CinderBullet.h"
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
+using namespace ph;
 
 namespace size {
 	unsigned const int 
@@ -57,6 +62,10 @@ protected:
 	Area viewport;
 
 	DeferredRenderer *deferredRenderer;
+
+	vector<TestBox*> testBoxList;
+
+	int rigidCount;
 };
 
 void TestApp::prepareSettings(Settings *settings) {
@@ -76,13 +85,22 @@ void TestApp::resetCamera() {
 }
 
 void TestApp::setup() {
+	bullet::getWorld()->setGravity(btVector3(0, -9.81f, 0));
+
+	bullet::shape::Box* boxFloorShape(new bullet::shape::Box(Vec3f(0.0f, 8.0f, 0.0f), Vec3f(512.0f, 1.0f, 512.0), false));
+	bullet::getWorld()->addRigidBody(boxFloorShape->getRigidBody().get());
+
 	deferredRenderer = new DeferredRenderer(1280, 600);
 	deferredRenderer->setCamera(&mCamera);
 	deferredRenderer->deferredShader = new gl::GlslProg(loadAsset("shaders/deferred.vert"), loadAsset("shaders/deferred.frag")); 
 	deferredRenderer->pointLightShader = new gl::GlslProg(loadAsset("shaders/pointLight.vert"), loadAsset("shaders/pointLight.frag")); 
 
-	for (int i = 0; i < 4; i++) {
-		deferredRenderer->lightList.push_back(new PointLight());
+	PointLight *ref;
+	for (int i = 0; i < 0; i++) {
+		ref = new PointLight();
+		ref->setPosition(randFloat(-256.0f, 256.0f), 4.0f, randFloat(-256.0f, 256.0f));
+		ref->setRadius(32.0f);
+		deferredRenderer->lightList.push_back(ref);
 	}
 
 	// Reset kamery.
@@ -100,13 +118,42 @@ void TestApp::setup() {
 }
 
 void TestApp::update() {
-	for (size_t i = 0; i < deferredRenderer->lightList.size(); i++) {
-		float t = (float)getElapsedSeconds() + (float)i * 2.0f;
-		deferredRenderer->lightList[i]->setPosition(
-			(float)cos(t) * 8.0f,
-			8.0f + (float)sin(t * 2.0f) * 4.0f,
-			(float)sin(t) * 8.0f);
+	rigidCount = bullet::getWorld()->getNumCollisionObjects();
+	bullet::getWorld()->stepSimulation(btScalar( getElapsedSeconds() ), 8);
+	btRigidBody *body;
+	for (int i = 0; i < testBoxList.size(); i++) {
+		body = testBoxList[i]->shape->getRigidBody().get();
+
+		float matrix[16];
+		((btDefaultMotionState*)body->getMotionState())->m_graphicsWorldTrans.getOpenGLMatrix(&matrix[0]);
+
+		float x = matrix[3 * 4 + 0];
+		float y = matrix[3 * 4 + 1];
+		float z = matrix[3 * 4 + 2];
+		
+		testBoxList[i]->light->setPosition(x, y, z);
 	}
+
+	//btCollisionObject* obj;
+	//btRigidBody* body;
+	//for (int i = rigidCount - 1; i >= 0; --i) {
+		//btCollisionObject* obj = bullet::getWorld()->getCollisionObjectArray()[i];
+		//btRigidBody* body = btRigidBody::upcast(obj);
+		//body->getMotionState()->getWorldTransform();
+		/*
+		// get rigid body
+		btCollisionObject* obj = bullet::getWorld()->getCollisionObjectArray()[i];
+		btRigidBody* body = btRigidBody::upcast(obj);
+		if (body && body->getMotionState())
+		{
+			// get the body transformations
+			btTransform trans;
+			body->getMotionState()->getWorldTransform(trans);
+
+			if( trans.getOrigin().length() > 200.0f )
+				bullet::getWorld()->removeRigidBody( body );
+		}*/
+	//}
 }
 
 // toString.
@@ -135,7 +182,7 @@ void TestApp::draw() {
 	gl::popMatrices();
 
 	gl::enableAlphaBlending();
-	gl::drawString("fps: " + toStr(getAverageFps()), Vec2f(8.0f, 8.0f), Color::white(), Font("Arial", 16.0f));
+	gl::drawString("fps: " + toStr(getAverageFps()) + ", rigidCount: " + toStr(rigidCount), Vec2f(8.0f, 8.0f), Color::white(), Font("Arial", 16.0f));
 	gl::disableAlphaBlending();
 }
 
@@ -153,8 +200,10 @@ void TestApp::renderScene() {
 			gl::scale(Vec3f(scale, scale, scale));
 			gl::draw(mModel);
 			gl::popMatrices();
+			//gl::drawCube(Vec3f::zero(), Vec3f(512.0f, 1.0f, 512.0f));
+			bullet::drawWorld();
 			for (size_t i = 0; i < deferredRenderer->lightList.size(); i++) {
-				gl::drawSphere(deferredRenderer->lightList[i]->getPosition(), 1.0f, 6);
+				gl::drawSphere(deferredRenderer->lightList[i]->getPosition(), 1.0f, 4);
 			}
 		gl::disableDepthWrite();
 		gl::disableDepthRead();
@@ -177,10 +226,18 @@ void TestApp::keyDown(KeyEvent event) {
 			quit();
 			break;
 		}
-		case KeyEvent::KEY_1: {
-			break;
-		}
-		case KeyEvent::KEY_2: {
+		case KeyEvent::KEY_SPACE: {
+			TestBox *ref;
+			ref = new TestBox();
+			bullet::shape::Box* boxShape(new bullet::shape::Box(Vec3f(0.0f, 8.0f, 0.0f), Vec3f(4.0f, 4.0f, 4.0f), true));
+			ref->shape = boxShape;
+			bullet::getWorld()->addRigidBody(boxShape->getRigidBody().get());
+			ref->light = new PointLight();
+			deferredRenderer->lightList.push_back(ref->light);
+			//ref->light->setRadius(64.0f);
+			//ref->light->setColor(1.0f, 1.0f, 1.0f);
+			//ref->light->setPosition(0.0f, 0.0f, 0.0f);
+			testBoxList.push_back(ref);
 			break;
 		}
 	}

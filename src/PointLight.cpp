@@ -4,7 +4,7 @@
 
 PointLight::PointLight() {
 	position = Vec3f::zero();
-	radius = 8.0f + randFloat() * 4.0f;
+	radius = 16.0f + randFloat() * 8.0f;
 	setColor(randFloat(), randFloat(), randFloat());
 }
 

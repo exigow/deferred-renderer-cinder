@@ -77,7 +77,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\include;"..\..\cinder_0.8.5_vc2010\include";"..\..\cinder_0.8.5_vc2010\boost"%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Cinder\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\include;D:\Cinder\cinder_0.8.5_vc2010\boost;..\include;..\..\cinder_0.8.5_vc2010\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;NOMINMAX;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -92,7 +92,7 @@
       <AdditionalIncludeDirectories>"..\..\cinder_0.8.5_vc2010\include";..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>cinder.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cinder.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\BulletCollision.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\BulletDynamics.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\BulletSoftBody.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\ConvexDecomposition.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\HACD.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\LinearMath.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\OpenGLSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\cinder_0.8.5_vc2010\lib;..\..\cinder_0.8.5_vc2010\lib\msw</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
@@ -116,6 +116,7 @@
     <ClInclude Include="..\include\Resources.h" />
     <ClInclude Include="..\src\DeferredRenderer.h" />
     <ClInclude Include="..\src\PointLight.h" />
+    <ClInclude Include="..\src\TestBox.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

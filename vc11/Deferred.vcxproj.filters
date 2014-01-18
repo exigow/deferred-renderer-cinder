@@ -19,6 +19,9 @@
     <ClInclude Include="..\src\PointLight.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\TestBox.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
