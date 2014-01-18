@@ -2,6 +2,7 @@
 
 #include "cinder/Vector.h"
 #include "cinder/gl/GlslProg.h"
+#include "cinder/gl/Fbo.h"
 
 using namespace ci;
 
@@ -9,18 +10,16 @@ class DeferredRenderer
 {
 public:
 	DeferredRenderer();
-	~DeferredRenderer(void);
+	DeferredRenderer(int w, int h);
+	~DeferredRenderer();
 
-	enum {
-		GBUFFER = 0,
-		LIGHTS = 1
-	};
-
-	void setPointLightShader(gl::GlslProg *shader);
+	gl::GlslProg *pointLightShader, *deferredShader, *deferredPreviewShader;
+	
+	gl::Fbo deferredFBO, lightFBO;
+	gl::Fbo::Format deferredFBOFormat, lightFBOFormat;
 
 private:
-
-	gl::GlslProg *pointLightShader;
+	void setup(int width, int height);
 };
 
 	

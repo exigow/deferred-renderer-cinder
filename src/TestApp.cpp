@@ -54,9 +54,7 @@ public:
 	void resetCamera();
 	
 protected:
-	gl::Fbo mDeferredFBO, mLightFBO;
 	gl::Texture mTexture, mBackgroundTexture;
-	gl::GlslProg mDeferredShader, mDeferredPreviewShader, mLightShader;
 
 	CameraPersp mCamera;
 	MayaCamUI mMayaCamera;
@@ -68,7 +66,7 @@ protected:
 
 	int preview;
 
-	DeferredRenderer deferredRenderer;
+	DeferredRenderer *deferredRenderer;
 };
 
 void TestApp::prepareSettings(Settings *settings) {
@@ -88,6 +86,11 @@ void TestApp::resetCamera() {
 }
 
 void TestApp::setup() {
+	deferredRenderer = new DeferredRenderer(1280, 600);
+	deferredRenderer->deferredShader = new gl::GlslProg(loadAsset("deferred.vert"), loadAsset("deferred.frag")); 
+	deferredRenderer->deferredPreviewShader = new gl::GlslProg(loadAsset("deferredPreview.vert"), loadAsset("deferredPreview.frag")); 
+	deferredRenderer->pointLightShader = new gl::GlslProg(loadAsset("light.vert"), loadAsset("light.frag")); 
+
 	preview = fboPreview::GBUFFER;
 
 	for (int i = 0; i < 20; i++) {
@@ -106,33 +109,6 @@ void TestApp::setup() {
 	// Wczytywanie tekstury.
 	mTexture = gl::Texture(loadImage(loadAsset("test.png")));
 	mBackgroundTexture = gl::Texture(loadImage(loadAsset("background.png")));
-
-	// Wczytywanie shaderow.
-	mDeferredShader = gl::GlslProg(loadAsset("deferred.vert"), loadAsset("deferred.frag")); 
-	mDeferredPreviewShader = gl::GlslProg(loadAsset("deferredPreview.vert"), loadAsset("deferredPreview.frag")); 
-	mLightShader = gl::GlslProg(loadAsset("light.vert"), loadAsset("light.frag"));
-
-	deferredRenderer.setPointLightShader(new gl::GlslProg(loadAsset("light.vert"), loadAsset("light.frag")));
-
-
-	// Gbuffer.
-	gl::Fbo::Format mDeferredFBOFormat;
-		mDeferredFBOFormat.setColorInternalFormat(GL_RGBA16F_ARB); //GL_RGBA16F_ARB
-		mDeferredFBOFormat.enableColorBuffer(true, 3);
-		mDeferredFBOFormat.setSamples(0);
-		mDeferredFBOFormat.setCoverageSamples(0);
-	mDeferredFBO = gl::Fbo(size::bufferWidth, size::bufferHeight, mDeferredFBOFormat);
-		mDeferredFBO.getTexture(0).setFlipped(true);
-		mDeferredFBO.getTexture(1).setFlipped(true);
-		mDeferredFBO.getTexture(2).setFlipped(true);
-
-	// Light buffer.
-	gl::Fbo::Format mLightFBOFormat;
-		mLightFBOFormat.setColorInternalFormat(GL_RGBA8);
-		mLightFBOFormat.setSamples(0);
-		mLightFBOFormat.setCoverageSamples(0);
-	mLightFBO = gl::Fbo(size::bufferWidth, size::bufferHeight, mLightFBOFormat);
-		mLightFBO.getTexture(0).setFlipped(true);
 }
 
 void TestApp::update() {
@@ -155,65 +131,65 @@ void TestApp::draw() {
 	mMayaCamera.getCamera().getBillboardVectors(&mRight, &mUp);
 	
 	// Rendering sceny do FBO.
-	gl::setViewport(mDeferredFBO.getBounds());
-	mDeferredFBO.bindFramebuffer();
+	gl::setViewport(deferredRenderer->deferredFBO.getBounds());
+	deferredRenderer->deferredFBO.bindFramebuffer();
 		gl::clear(Color::black());
 		gl::pushMatrices();
 			gl::setMatricesWindow(size::windowWidth, size::windowWidth, false);
 			renderScene();
 		gl::popMatrices();
-	mDeferredFBO.unbindFramebuffer();
+	deferredRenderer->deferredFBO.unbindFramebuffer();
 
 	// Render LIGHT
-	mDeferredFBO.getTexture(0).bind(0);
-	mDeferredFBO.getTexture(1).bind(1);
-	mDeferredFBO.getTexture(2).bind(2);
-	gl::setViewport(mLightFBO.getBounds());
-	mLightShader.bind();
+	deferredRenderer->deferredFBO.getTexture(0).bind(0);
+	deferredRenderer->deferredFBO.getTexture(1).bind(1);
+	deferredRenderer->deferredFBO.getTexture(2).bind(2);
+	gl::setViewport(deferredRenderer->lightFBO.getBounds());
+	deferredRenderer->pointLightShader->bind();
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
 
-		mLightShader.uniform("frag0", 0);
-		mLightShader.uniform("frag1", 1);
-		mLightShader.uniform("frag2", 2);
-		mLightFBO.bindFramebuffer();
+		deferredRenderer->pointLightShader->uniform("frag0", 0);
+		deferredRenderer->pointLightShader->uniform("frag1", 1);
+		deferredRenderer->pointLightShader->uniform("frag2", 2);
+		deferredRenderer->lightFBO.bindFramebuffer();
 			gl::clear(Color::black());
 			gl::pushMatrices();
 				gl::setMatrices(mCamera);
 				for (size_t i = 0; i < list.size(); i++) {
-					mLightShader.uniform("lightPosition", mCamera.getModelViewMatrix().transformPointAffine(list[i].getPosition()));
-					mLightShader.uniform("lightRadius", list[i].getRadius() * .5f);
-					mLightShader.uniform("lightColor", list[i].getColor());
+					deferredRenderer->pointLightShader->uniform("lightPosition", mCamera.getModelViewMatrix().transformPointAffine(list[i].getPosition()));
+					deferredRenderer->pointLightShader->uniform("lightRadius", list[i].getRadius() * .5f);
+					deferredRenderer->pointLightShader->uniform("lightColor", list[i].getColor());
 					gl::drawCube(list[i].getPosition(), Vec3f(list[i].getRadius(), list[i].getRadius(), list[i].getRadius()));
 				}
 			gl::popMatrices();
 
 			glDisable(GL_BLEND);
-		mLightFBO.unbindFramebuffer();
-	mLightShader.unbind();
+		deferredRenderer->lightFBO.unbindFramebuffer();
+	deferredRenderer->pointLightShader->unbind();
 
 	// Preview
 	switch (preview) {
 		case fboPreview::LIGHTS: {
 			gl::setViewport(viewport);
 			gl::pushModelView();
-			gl::draw(mLightFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
+			gl::draw(deferredRenderer->lightFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
 			gl::popModelView();
 			break;
 		}
 		case fboPreview::GBUFFER: {
-			mDeferredFBO.getTexture(0).bind(0);
-			mDeferredFBO.getTexture(1).bind(1);
-			mDeferredFBO.getTexture(2).bind(2);
+			deferredRenderer->deferredFBO.getTexture(0).bind(0);
+			deferredRenderer->deferredFBO.getTexture(1).bind(1);
+			deferredRenderer->deferredFBO.getTexture(2).bind(2);
 			gl::setViewport(viewport);
-			mDeferredPreviewShader.bind();
-				mDeferredPreviewShader.uniform("frag0", 0);
-				mDeferredPreviewShader.uniform("frag1", 1);
-				mDeferredPreviewShader.uniform("frag2", 2);
+			deferredRenderer->deferredPreviewShader->bind();
+				deferredRenderer->deferredPreviewShader->uniform("frag0", 0);
+				deferredRenderer->deferredPreviewShader->uniform("frag1", 1);
+				deferredRenderer->deferredPreviewShader->uniform("frag2", 2);
 				gl::pushMatrices();
-					gl::draw(mDeferredFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
+					gl::draw(deferredRenderer->deferredFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
 				gl::popMatrices();
-			mDeferredPreviewShader.unbind();
+			deferredRenderer->deferredPreviewShader->unbind();
 			break;
 		}
 	}
@@ -227,8 +203,8 @@ void TestApp::draw() {
 
 void TestApp::renderScene() {
 	mTexture.bind(0);
-	mDeferredShader.bind();
-	mDeferredShader.uniform("mTexture", 1);
+	deferredRenderer->deferredShader->bind();
+	deferredRenderer->deferredShader->uniform("mTexture", 1);
 
 	gl::pushMatrices();
 		gl::setMatrices(mCamera);
@@ -245,7 +221,7 @@ void TestApp::renderScene() {
 		gl::disableDepthWrite();
 		gl::disableDepthRead();
 	gl::popMatrices();
-	mDeferredShader.unbind();
+	deferredRenderer->deferredShader->unbind();
 }
 
 void TestApp::mouseDown(MouseEvent event) {
