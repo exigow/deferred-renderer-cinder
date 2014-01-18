@@ -62,8 +62,6 @@ protected:
 	Vec3f mRight, mUp;
 	TriMesh mModel;
 
-	vector<PointLight> list;
-
 	int preview;
 
 	DeferredRenderer *deferredRenderer;
@@ -87,6 +85,7 @@ void TestApp::resetCamera() {
 
 void TestApp::setup() {
 	deferredRenderer = new DeferredRenderer(1280, 600);
+	deferredRenderer->setCamera(&mCamera);
 	deferredRenderer->deferredShader = new gl::GlslProg(loadAsset("deferred.vert"), loadAsset("deferred.frag")); 
 	deferredRenderer->deferredPreviewShader = new gl::GlslProg(loadAsset("deferredPreview.vert"), loadAsset("deferredPreview.frag")); 
 	deferredRenderer->pointLightShader = new gl::GlslProg(loadAsset("light.vert"), loadAsset("light.frag")); 
@@ -94,7 +93,7 @@ void TestApp::setup() {
 	preview = fboPreview::GBUFFER;
 
 	for (int i = 0; i < 20; i++) {
-		list.push_back(PointLight());
+		deferredRenderer->lightList.push_back(new PointLight());
 	}
 
 	// Reset kamery.
@@ -112,9 +111,9 @@ void TestApp::setup() {
 }
 
 void TestApp::update() {
-	for (size_t i = 0; i < list.size(); i++) {
+	for (size_t i = 0; i < deferredRenderer->lightList.size(); i++) {
 		float t = (float)getElapsedSeconds() + (float)i * 2.0f;
-		list[i].setPosition(
+		deferredRenderer->lightList[i]->setPosition(
 			(float)cos(t) * 8.0f,
 			8.0f + (float)sin(t * 2.0f) * 4.0f,
 			(float)sin(t) * 8.0f);
@@ -140,33 +139,8 @@ void TestApp::draw() {
 		gl::popMatrices();
 	deferredRenderer->deferredFBO.unbindFramebuffer();
 
-	// Render LIGHT
-	deferredRenderer->deferredFBO.getTexture(0).bind(0);
-	deferredRenderer->deferredFBO.getTexture(1).bind(1);
-	deferredRenderer->deferredFBO.getTexture(2).bind(2);
-	gl::setViewport(deferredRenderer->lightFBO.getBounds());
-	deferredRenderer->pointLightShader->bind();
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
 
-		deferredRenderer->pointLightShader->uniform("frag0", 0);
-		deferredRenderer->pointLightShader->uniform("frag1", 1);
-		deferredRenderer->pointLightShader->uniform("frag2", 2);
-		deferredRenderer->lightFBO.bindFramebuffer();
-			gl::clear(Color::black());
-			gl::pushMatrices();
-				gl::setMatrices(mCamera);
-				for (size_t i = 0; i < list.size(); i++) {
-					deferredRenderer->pointLightShader->uniform("lightPosition", mCamera.getModelViewMatrix().transformPointAffine(list[i].getPosition()));
-					deferredRenderer->pointLightShader->uniform("lightRadius", list[i].getRadius() * .5f);
-					deferredRenderer->pointLightShader->uniform("lightColor", list[i].getColor());
-					gl::drawCube(list[i].getPosition(), Vec3f(list[i].getRadius(), list[i].getRadius(), list[i].getRadius()));
-				}
-			gl::popMatrices();
-
-			glDisable(GL_BLEND);
-		deferredRenderer->lightFBO.unbindFramebuffer();
-	deferredRenderer->pointLightShader->unbind();
+	deferredRenderer->renderLights();
 
 	// Preview
 	switch (preview) {
@@ -215,8 +189,8 @@ void TestApp::renderScene() {
 			gl::scale(Vec3f(scale, scale, scale));
 			gl::draw(mModel);
 			gl::popMatrices();
-			for (size_t i = 0; i < list.size(); i++) {
-				gl::drawSphere(list[i].getPosition(), 1.0f, 6);
+			for (size_t i = 0; i < deferredRenderer->lightList.size(); i++) {
+				gl::drawSphere(deferredRenderer->lightList[i]->getPosition(), 1.0f, 6);
 			}
 		gl::disableDepthWrite();
 		gl::disableDepthRead();
