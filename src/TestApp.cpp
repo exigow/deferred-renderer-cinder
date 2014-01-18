@@ -32,13 +32,6 @@ namespace size {
 	const float windowRatio = (float)windowWidth / (float)windowHeight;
 };
 
-namespace fboPreview {
-	enum {
-		GBUFFER = 0,
-		LIGHTS = 1
-	};
-}
-
 class TestApp : public AppBasic {
 public:
 	void setup();
@@ -59,10 +52,9 @@ protected:
 	CameraPersp mCamera;
 	MayaCamUI mMayaCamera;
 
-	Vec3f mRight, mUp;
 	TriMesh mModel;
 
-	int preview;
+	Area viewport;
 
 	DeferredRenderer *deferredRenderer;
 };
@@ -89,8 +81,6 @@ void TestApp::setup() {
 	deferredRenderer->deferredShader = new gl::GlslProg(loadAsset("deferred.vert"), loadAsset("deferred.frag")); 
 	deferredRenderer->deferredPreviewShader = new gl::GlslProg(loadAsset("deferredPreview.vert"), loadAsset("deferredPreview.frag")); 
 	deferredRenderer->pointLightShader = new gl::GlslProg(loadAsset("light.vert"), loadAsset("light.frag")); 
-
-	preview = fboPreview::GBUFFER;
 
 	for (int i = 0; i < 20; i++) {
 		deferredRenderer->lightList.push_back(new PointLight());
@@ -126,8 +116,7 @@ template <typename T> string toStr(const T& t) {
 }
 
 void TestApp::draw() {
-	Area viewport = gl::getViewport();
-	mMayaCamera.getCamera().getBillboardVectors(&mRight, &mUp);
+	viewport = gl::getViewport();
 	
 	// Rendering sceny do FBO.
 	gl::setViewport(deferredRenderer->deferredFBO.getBounds());
@@ -139,36 +128,13 @@ void TestApp::draw() {
 		gl::popMatrices();
 	deferredRenderer->deferredFBO.unbindFramebuffer();
 
-
 	deferredRenderer->renderLights();
+	deferredRenderer->renderOutput();
 
-	// Preview
-	switch (preview) {
-		case fboPreview::LIGHTS: {
-			gl::setViewport(viewport);
-			gl::pushModelView();
-			gl::draw(deferredRenderer->lightFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
-			gl::popModelView();
-			break;
-		}
-		case fboPreview::GBUFFER: {
-			deferredRenderer->deferredFBO.getTexture(0).bind(0);
-			deferredRenderer->deferredFBO.getTexture(1).bind(1);
-			deferredRenderer->deferredFBO.getTexture(2).bind(2);
-			gl::setViewport(viewport);
-			deferredRenderer->deferredPreviewShader->bind();
-				deferredRenderer->deferredPreviewShader->uniform("frag0", 0);
-				deferredRenderer->deferredPreviewShader->uniform("frag1", 1);
-				deferredRenderer->deferredPreviewShader->uniform("frag2", 2);
-				gl::pushMatrices();
-					gl::draw(deferredRenderer->deferredFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
-				gl::popMatrices();
-			deferredRenderer->deferredPreviewShader->unbind();
-			break;
-		}
-	}
-
-	
+	gl::setViewport(viewport);
+	gl::pushMatrices();
+		gl::draw(deferredRenderer->outputFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
+	gl::popMatrices();
 
 	gl::enableAlphaBlending();
 	gl::drawString("fps: " + toStr(getAverageFps()), Vec2f(8.0f, 8.0f), Color::white(), Font("Arial", 16.0f));
@@ -214,11 +180,9 @@ void TestApp::keyDown(KeyEvent event) {
 			break;
 		}
 		case KeyEvent::KEY_1: {
-			preview = fboPreview::GBUFFER;
 			break;
 		}
 		case KeyEvent::KEY_2: {
-			preview = fboPreview::LIGHTS;
 			break;
 		}
 	}
