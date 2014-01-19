@@ -175,15 +175,14 @@ void TestApp::renderScene() {
 		gl::enableDepthRead();
 		gl::enableDepthWrite();
 			gl::pushMatrices();
-			float scale = 96.0f;
+			float scale = 256.0f;
 			gl::scale(Vec3f(scale, scale, scale));
-			gl::draw(mModel);
+			//gl::draw(mModel);
 			gl::popMatrices();
-			//gl::drawCube(Vec3f::zero(), Vec3f(512.0f, 1.0f, 512.0f));
 			bullet::drawWorld();
-			for (size_t i = 0; i < deferredRenderer->lightList.size(); i++) {
+			/*for (size_t i = 0; i < deferredRenderer->lightList.size(); i++) {
 				gl::drawSphere(deferredRenderer->lightList[i]->getPosition(), 1.0f, 4);
-			}
+			}*/
 		gl::disableDepthWrite();
 		gl::disableDepthRead();
 	gl::popMatrices();
@@ -208,14 +207,16 @@ void TestApp::keyDown(KeyEvent event) {
 		case KeyEvent::KEY_SPACE: {
 			TestBox *ref;
 			ref = new TestBox();
-			bullet::shape::Box* boxShape(new bullet::shape::Box(Vec3f(0.0f, 8.0f, 0.0f), Vec3f(4.0f, 4.0f, 4.0f), true));
+			bullet::shape::Box *boxShape(new bullet::shape::Box(Vec3f(0.0f, 128.0f, 0.0f), Vec3f(4.0f, 4.0f, 4.0f), true));
+			float scale = 16.0f;
+			boxShape->getRigidBody()->applyCentralImpulse(btVector3(randFloat(-scale, scale), randFloat(-scale, scale), randFloat(-scale, scale)));
+			boxShape->getRigidBody()->applyTorqueImpulse(btVector3(randFloat(-scale, scale), randFloat(-scale, scale), randFloat(-scale, scale)));
+
 			ref->shape = boxShape;
 			bullet::getWorld()->addRigidBody(boxShape->getRigidBody().get());
 			ref->light = new PointLight();
 			deferredRenderer->lightList.push_back(ref->light);
 			ref->light->setRadius(24.0f);
-			//ref->light->setColor(1.0f, 1.0f, 1.0f);
-			//ref->light->setPosition(0.0f, 0.0f, 0.0f);
 			testBoxList.push_back(ref);
 			break;
 		}
