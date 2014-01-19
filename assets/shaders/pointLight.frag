@@ -28,7 +28,7 @@ void main() {
 	vec3 normal = texture2D(normalMap, uv).rgb;
 
 	//vec3 h = normalize(localPosition + normalize(cameraPosition - position));
-	//float phong = .5f * pow(max(dot(h, normal), 0.0), 64.0);
+	//float phong = .75f * pow(max(dot(h, normal), 0.0), 32.0);
 
 	gl_FragColor = vec4(strength * lightColor, 1);  // + phong
 }

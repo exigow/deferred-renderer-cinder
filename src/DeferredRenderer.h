@@ -26,11 +26,14 @@ public:
 
 	void setCamera(CameraPersp *camera);
 	void renderLights();
+	int getWidth();
+	int getHeight();
 
 private:
 	void setup(int width, int height);
 	CameraPersp *camera;
 	void drawQuad();
+	int width, height;
 };
 
 	

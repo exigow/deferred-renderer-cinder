@@ -11,11 +11,24 @@ DeferredRenderer::DeferredRenderer() {
 DeferredRenderer::~DeferredRenderer() {
 }
 
+// Get size.
+int DeferredRenderer::getWidth() {
+	return width;
+}
+int DeferredRenderer::getHeight() {
+	return height;
+}
+
+// Set camera pointer.
 void DeferredRenderer::setCamera(CameraPersp *camera) {
 	this->camera = camera;
 }
 
+// Setup deferred. Create FBOs.
 void DeferredRenderer::setup(int width, int height) {
+	this->width = width;
+	this->height = height;
+
 	deferredFBOFormat.setColorInternalFormat(GL_RGBA16F_ARB);
 	deferredFBOFormat.enableColorBuffer(true, 3);
 	deferredFBOFormat.setSamples(0);

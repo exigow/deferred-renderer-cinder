@@ -10,6 +10,12 @@
     <ClCompile Include="..\src\PointLight.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\PostProcessor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utilities.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Resources.h" />
@@ -19,7 +25,13 @@
     <ClInclude Include="..\src\PointLight.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\TestBox.h">
+    <ClInclude Include="..\src\PostProcessor.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BouncingBox.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utilities.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>

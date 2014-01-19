@@ -9,10 +9,11 @@ public:
 	PointLight();
 	~PointLight(void);
 
-	void setColor(float red, float green, float blue);
 	Vec3f getColor();
+	void randomizeColor();
 
 	void setPosition(float x, float y, float z);
+	void setPosition(Vec3f position);
 	Vec3f getPosition();
 
 	void setRadius(float radius);

@@ -5,16 +5,15 @@
 
 using namespace ci;
 
-class TestBox
+class BouncingBox
 {
 public:
-	TestBox();
+	BouncingBox();
 
 	Vec3f position;
 	PointLight *light;
 	ph::bullet::shape::Box *shape;
 };
 
-TestBox::TestBox() {
+BouncingBox::BouncingBox() {
 }
-
