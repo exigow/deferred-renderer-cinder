@@ -94,7 +94,7 @@ void TestApp::setup() {
 	bullet::getWorld()->addRigidBody(boxFloorShape->getRigidBody().get());
 
 	// Deferred renderer create.
-	deferredRenderer = new DeferredRenderer(640, 480);
+	deferredRenderer = new DeferredRenderer(1366, 768);
 	deferredRenderer->setCamera(&mCamera);
 	deferredRenderer->deferredShader = new gl::GlslProg(loadAsset("shaders/deferred.vert"), loadAsset("shaders/deferred.frag")); 
 	deferredRenderer->pointLightShader = new gl::GlslProg(loadAsset("shaders/pointLight.vert"), loadAsset("shaders/pointLight.frag")); 
@@ -192,7 +192,7 @@ void TestApp::keyDown(KeyEvent event) {
 			BouncingBox *ref;
 			ref = new BouncingBox();
 			bullet::shape::Box *boxShape(new bullet::shape::Box(Vec3f(0.0f, 128.0f, 0.0f), Vec3f(4.0f, 4.0f, 4.0f), true));
-			float scale = 32.0f;
+			float scale = 16.0f;
 			boxShape->getRigidBody()->applyCentralImpulse(btVector3(randFloat(-scale, scale), randFloat(-scale, scale), randFloat(-scale, scale)));
 			boxShape->getRigidBody()->applyTorqueImpulse(btVector3(randFloat(-scale, scale), randFloat(-scale, scale), randFloat(-scale, scale)));
 			boxShape->getRigidBody()->setRestitution(btScalar(0.75f));
@@ -200,7 +200,7 @@ void TestApp::keyDown(KeyEvent event) {
 			bullet::getWorld()->addRigidBody(boxShape->getRigidBody().get());
 			ref->light = new PointLight();
 			deferredRenderer->lightList.push_back(ref->light);
-			ref->light->setRadius(64.0f);
+			ref->light->setRadius(24.0f);
 			bouncingBoxList.push_back(ref);
 			break;
 		}
