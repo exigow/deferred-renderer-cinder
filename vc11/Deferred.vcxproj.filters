@@ -10,9 +10,6 @@
     <ClCompile Include="..\src\PointLight.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\PostProcessor.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Utilities.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -23,9 +20,6 @@
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="..\src\PointLight.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\PostProcessor.h">
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="..\src\BouncingBox.h">

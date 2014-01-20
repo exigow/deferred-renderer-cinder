@@ -17,19 +17,31 @@ public:
 	DeferredRenderer();
 	DeferredRenderer(int w, int h);
 	~DeferredRenderer();
-	
-	gl::GlslProg *pointLightShader, *deferredShader;
+
 	gl::Fbo deferredFBO, lightFBO;
-	gl::Fbo::Format deferredFBOFormat, lightFBOFormat;
+
+	gl::GlslProg *pointLightShader, *deferredShader;
 
 	std::vector<PointLight*> lightList;
 
 	void setCamera(CameraPersp *camera);
 	void renderLights();
+
 	int getWidth();
 	int getHeight();
 
+	enum BufferTexture {
+		BUFTEX_ALBEDO_AND_DEPTH,
+		BUFTEX_NORMAL,
+		BUFTEX_POSITION,
+		BUFTEX_LIGHT
+	};
+
+	gl::Texture getBufferTexture(BufferTexture texture);
+
 private:
+	gl::Fbo::Format deferredFBOFormat, lightFBOFormat;
+
 	void setup(int width, int height);
 	CameraPersp *camera;
 	void drawQuad();

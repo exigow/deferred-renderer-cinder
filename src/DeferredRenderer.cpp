@@ -38,17 +38,46 @@ void DeferredRenderer::setup(int width, int height) {
 		deferredFBO.getTexture(1).setFlipped(true);
 		deferredFBO.getTexture(2).setFlipped(true);
 
-	lightFBOFormat.setColorInternalFormat(GL_RGBA8);
+	lightFBOFormat.setColorInternalFormat(GL_RGB8);
 	lightFBOFormat.setSamples(0);
 	lightFBOFormat.setCoverageSamples(0);
 	lightFBO = gl::Fbo(width, height, lightFBOFormat);
 		lightFBO.getTexture(0).setFlipped(true);
 }
 
+gl::Texture DeferredRenderer::getBufferTexture(DeferredRenderer::BufferTexture texture) {
+	gl::Fbo *fbo;
+	int fromBuffer;
+	if (texture == BUFTEX_ALBEDO_AND_DEPTH || texture == BUFTEX_NORMAL || texture == BUFTEX_POSITION) {
+		fbo = &deferredFBO;
+		switch (texture) {
+			case BUFTEX_ALBEDO_AND_DEPTH: {
+				fromBuffer = 0;
+				break;
+			}
+			case BUFTEX_NORMAL: {
+				fromBuffer = 1;
+				break;
+			}
+			case BUFTEX_POSITION: {
+				fromBuffer = 2;
+				break;
+			}
+		}
+	} else {
+		if (texture == BUFTEX_LIGHT) {
+			fbo = &lightFBO;
+			fromBuffer = 0;
+		}
+	}
+
+	return fbo->getTexture(fromBuffer);
+}
+
 void DeferredRenderer::renderLights() {
-	deferredFBO.getTexture(0).bind(0);
-	deferredFBO.getTexture(1).bind(1);
-	deferredFBO.getTexture(2).bind(2);
+	this->getBufferTexture(BUFTEX_ALBEDO_AND_DEPTH).bind(0);
+	this->getBufferTexture(BUFTEX_NORMAL).bind(1);
+	this->getBufferTexture(BUFTEX_POSITION).bind(2);
 
 	gl::setViewport(lightFBO.getBounds());
 	pointLightShader->bind();

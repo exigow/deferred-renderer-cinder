@@ -63,6 +63,7 @@ protected:
 	Area viewport;
 
 	DeferredRenderer *deferredRenderer;
+	gl::GlslProg *fxaaShader;
 
 	vector<BouncingBox*> bouncingBoxList;
 	int rigidCount;
@@ -90,7 +91,7 @@ void TestApp::setup() {
 
 	// Physics floor shape.
 	bullet::shape::Box* boxFloorShape(new bullet::shape::Box(Vec3f(0.0f, 0.0f, 0.0f), Vec3f(1024.0f, 1.0f, 1024.0f), false));
-	boxFloorShape->getRigidBody()->setRestitution(btScalar(0.75f));
+	boxFloorShape->getRigidBody()->setRestitution(btScalar(0.825f));
 	bullet::getWorld()->addRigidBody(boxFloorShape->getRigidBody().get());
 
 	// Deferred renderer create.
@@ -98,6 +99,9 @@ void TestApp::setup() {
 	deferredRenderer->setCamera(&mCamera);
 	deferredRenderer->deferredShader = new gl::GlslProg(loadAsset("shaders/deferred.vert"), loadAsset("shaders/deferred.frag")); 
 	deferredRenderer->pointLightShader = new gl::GlslProg(loadAsset("shaders/pointLight.vert"), loadAsset("shaders/pointLight.frag")); 
+
+	// PP.
+	fxaaShader = new gl::GlslProg(loadAsset("shaders/fxaa.vert"), loadAsset("shaders/fxaa.frag")); 
 
 	// Camera reset.
 	resetCamera();
@@ -117,7 +121,7 @@ void TestApp::setup() {
 void TestApp::update() {
 	rigidCount = ph::bullet::getWorld()->getNumCollisionObjects();
 
-	ph::bullet::getWorld()->stepSimulation(btScalar( getElapsedSeconds() ), 8);
+	ph::bullet::getWorld()->stepSimulation(btScalar(getElapsedSeconds()), 8);
 	btRigidBody *body;
 	for (size_t i = 0; i < bouncingBoxList.size(); i++) {
 		body = bouncingBoxList[i]->shape->getRigidBody().get();
@@ -142,10 +146,20 @@ void TestApp::draw() {
 
 	deferredRenderer->renderLights();
 
-	gl::setViewport(viewport);
+	/*gl::setViewport(viewport);
 	gl::pushMatrices();
 		gl::draw(deferredRenderer->lightFBO.getTexture(0), Rectf(0, 0, (float)WINDOW_W, (float)WINDOW_H));
+	gl::popMatrices();*/
+
+	//deferredRenderer->deferredFBO.getTexture(0).bind(0);
+	gl::setViewport(viewport);
+	fxaaShader->bind();
+	fxaaShader->uniform("source", 0);
+	fxaaShader->uniform("frameBufSize", Vec2f(deferredRenderer->getWidth(), deferredRenderer->getHeight()));
+	gl::pushMatrices();
+	gl::draw(deferredRenderer->lightFBO.getTexture(0), Rectf(0, 0, (float)WINDOW_W, (float)WINDOW_H));
 	gl::popMatrices();
+	fxaaShader->unbind();
 
 	gl::enableAlphaBlending();
 	gl::drawString("fps: " + toString((int)getAverageFps()) + ", rigidCount: " + toString(rigidCount), Vec2f(8.0f, 8.0f), Color::white(), Font("Arial", 16.0f));
@@ -195,12 +209,12 @@ void TestApp::keyDown(KeyEvent event) {
 			float scale = 16.0f;
 			boxShape->getRigidBody()->applyCentralImpulse(btVector3(randFloat(-scale, scale), randFloat(-scale, scale), randFloat(-scale, scale)));
 			boxShape->getRigidBody()->applyTorqueImpulse(btVector3(randFloat(-scale, scale), randFloat(-scale, scale), randFloat(-scale, scale)));
-			boxShape->getRigidBody()->setRestitution(btScalar(0.75f));
+			boxShape->getRigidBody()->setRestitution(btScalar(0.825f));
 			ref->shape = boxShape;
 			bullet::getWorld()->addRigidBody(boxShape->getRigidBody().get());
 			ref->light = new PointLight();
 			deferredRenderer->lightList.push_back(ref->light);
-			ref->light->setRadius(24.0f);
+			ref->light->setRadius(64.0f);
 			bouncingBoxList.push_back(ref);
 			break;
 		}
