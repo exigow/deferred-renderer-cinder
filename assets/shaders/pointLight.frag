@@ -12,7 +12,7 @@ uniform float lightRadius;
 varying vec4 pos;
 
 void main() {
-	vec2 uv = pos.xy / pos.w * 0.5f + 0.5f;
+	vec2 uv = pos.xy / pos.w * 0.5 + 0.5;
 
 	vec3 position = texture2D(positionMap, uv).rgb;
 
@@ -22,10 +22,10 @@ void main() {
 		discard;
 	}
 
-	vec3 strength = 1.0 - (distance / lightRadius);
-	strength.x = pow(strength.x, 2);
-	strength.y = pow(strength.y, 2);
-	strength.z = pow(strength.z, 2);
+	vec3 strength = vec3(1.0 - (distance / lightRadius));
+	strength.x = pow(strength.x, 2.0);
+	strength.y = pow(strength.y, 2.0);
+	strength.z = pow(strength.z, 2.0);
 
 	vec3 albedo = texture2D(albedoAndDepthMap, uv).rgb;
 	vec3 normal = texture2D(normalMap, uv).rgb;
@@ -34,5 +34,5 @@ void main() {
 	//float phong = .25f * pow(max(dot(h, normal), 0.0), 64.0);
 	
 
-	gl_FragColor = vec4(strength * lightColor, 1);  // + phong
+	gl_FragColor = vec4(strength * lightColor, 1.0);  // + phong
 }

@@ -79,6 +79,8 @@ void DeferredRenderer::renderLights() {
 	this->getBufferTexture(BUFTEX_NORMAL).bind(1);
 	this->getBufferTexture(BUFTEX_POSITION).bind(2);
 
+	//glLoadIdentity();
+	gl::pushMatrices();
 	gl::setViewport(lightFBO.getBounds());
 	pointLightShader->bind();
 
@@ -112,16 +114,5 @@ void DeferredRenderer::renderLights() {
 		glDisable(GL_BLEND);
 
 	pointLightShader->unbind();
-}
-
-void DeferredRenderer::drawQuad() {
-	gl::pushMatrices();
-	gl::scale(128.0f, 128.0f, 1.0f);
-	glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f);
-		glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 1.0f);
-		glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 0.0f);
-	glEnd();
 	gl::popMatrices();
 }

@@ -16,6 +16,7 @@ class DeferredRenderer
 public:
 	DeferredRenderer();
 	DeferredRenderer(int w, int h);
+
 	~DeferredRenderer();
 
 	gl::Fbo deferredFBO, lightFBO;
@@ -43,8 +44,9 @@ private:
 	gl::Fbo::Format deferredFBOFormat, lightFBOFormat;
 
 	void setup(int width, int height);
+
 	CameraPersp *camera;
-	void drawQuad();
+	
 	int width, height;
 };
 

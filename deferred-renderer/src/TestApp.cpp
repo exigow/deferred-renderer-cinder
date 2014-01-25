@@ -51,6 +51,7 @@ public:
 	void keyDown(KeyEvent event);
 
 	void resetCamera();
+	void generateBlurFBO();
 	
 protected:
 	gl::Texture mTexture, mBackgroundTexture;
@@ -64,6 +65,8 @@ protected:
 
 	DeferredRenderer *deferredRenderer;
 	gl::GlslProg *fxaaShader;
+
+	gl::Fbo *blurFBO[4];
 
 	vector<BouncingBox*> bouncingBoxList;
 	int rigidCount;
@@ -103,6 +106,19 @@ void TestApp::setup() {
 	// PP.
 	fxaaShader = new gl::GlslProg(loadAsset("shaders/fxaa.vert"), loadAsset("shaders/fxaa.frag")); 
 
+	gl::Fbo::Format blurFBOFormat;
+	blurFBOFormat.setColorInternalFormat(GL_RGB8);
+	blurFBOFormat.setSamples(0);
+	blurFBOFormat.setCoverageSamples(0);
+	blurFBO[0] = new gl::Fbo(256, 256, blurFBOFormat);
+		blurFBO[0]->getTexture().setFlipped(true);
+	/*blurFBO[1] = new gl::Fbo(256, 256, blurFBOFormat);
+		blurFBO[1]->getTexture().setFlipped(true);
+	blurFBO[2] = new gl::Fbo(128, 128, blurFBOFormat);
+		blurFBO[2]->getTexture().setFlipped(true);
+	blurFBO[3] = new gl::Fbo(64, 64, blurFBOFormat);
+		blurFBO[3]->getTexture().setFlipped(true);*/
+
 	// Camera reset.
 	resetCamera();
 
@@ -131,39 +147,39 @@ void TestApp::update() {
 	}
 }
 
+void TestApp::generateBlurFBO() {
+	//gl::setViewport(blurFBO[0]->getBounds());
+	//gl::setViewport(deferredRenderer->getBufferTexture()
+	//blurFBO[0]->bindFramebuffer();
+	//gl::clear(Color(0.125f, 0.0f, 0.0f));
+	//blurFBO[0]->unbindFramebuffer();
+}
 void TestApp::draw() {
-	viewport = gl::getViewport();
-	
-	// Rendering sceny do FBO.
+	gl::clear(Color::black());
 	gl::setViewport(deferredRenderer->deferredFBO.getBounds());
+
+	// Rendering sceny do FBO
 	deferredRenderer->deferredFBO.bindFramebuffer();
-		gl::clear(Color::black());
-		gl::pushMatrices();
-			gl::setMatricesWindow(WINDOW_W, WINDOW_H, false);
-			renderScene();
-		gl::popMatrices();
+	gl::clear(Color::black());
+	gl::pushMatrices();
+		renderScene();
+	gl::popMatrices();
 	deferredRenderer->deferredFBO.unbindFramebuffer();
 
+	// Render lights.
 	deferredRenderer->renderLights();
 
-	/*gl::setViewport(viewport);
-	gl::pushMatrices();
-		gl::draw(deferredRenderer->lightFBO.getTexture(0), Rectf(0, 0, (float)WINDOW_W, (float)WINDOW_H));
-	gl::popMatrices();*/
+	generateBlurFBO();
 
-	//deferredRenderer->deferredFBO.getTexture(0).bind(0);
-	gl::setViewport(viewport);
 	fxaaShader->bind();
 	fxaaShader->uniform("source", 0);
-	fxaaShader->uniform("frameBufSize", Vec2f(deferredRenderer->getWidth(), deferredRenderer->getHeight()));
-	gl::pushMatrices();
+	fxaaShader->uniform("frameBufSize", Vec2f((float)deferredRenderer->getWidth(), (float)deferredRenderer->getHeight()));
 	gl::draw(deferredRenderer->lightFBO.getTexture(0), Rectf(0, 0, (float)WINDOW_W, (float)WINDOW_H));
-	gl::popMatrices();
 	fxaaShader->unbind();
 
-	gl::enableAlphaBlending();
-	gl::drawString("fps: " + toString((int)getAverageFps()) + ", rigidCount: " + toString(rigidCount), Vec2f(8.0f, 8.0f), Color::white(), Font("Arial", 16.0f));
-	gl::disableAlphaBlending();
+	//gl::draw(blurFBO[0]->getTexture(0), Rectf(128.0f, 128.0f, 256.0f, 256.0f));
+
+	Utilities::drawStringSimple("fps: " + toString((int)getAverageFps()) + ", rigidCount: " + toString(rigidCount), 8.0f, 8.0f);
 }
 
 void TestApp::renderScene() {
@@ -175,11 +191,11 @@ void TestApp::renderScene() {
 		gl::setMatrices(mCamera);
 		gl::enableDepthRead();
 		gl::enableDepthWrite();
-			/*gl::pushMatrices();
-			float scale = 256.0f;
+			gl::pushMatrices();
+			float scale = 512.0f;
 			gl::scale(Vec3f(scale, scale, scale));
 			gl::draw(mModel);
-			gl::popMatrices();*/
+			gl::popMatrices();
 			bullet::drawWorld();
 		gl::disableDepthWrite();
 		gl::disableDepthRead();

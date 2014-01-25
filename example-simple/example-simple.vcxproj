@@ -11,10 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5B2258FC-5398-4E09-A6CA-085DDBD232D5}</ProjectGuid>
-    <RootNamespace>Deferred</RootNamespace>
+    <ProjectGuid>{3C658725-DA25-46CA-A37A-623EE4DD4F86}</ProjectGuid>
+    <RootNamespace>example-simple</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>Deferred</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -51,7 +50,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include;"..\..\cinder_0.8.5_vc2010\include";"..\..\cinder_0.8.5_vc2010\boost"</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;"..\..\..\cinder_0.8.5_vc2010\include";"..\..\..\cinder_0.8.5_vc2010\boost"</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;NOMINMAX;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -62,11 +61,11 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>"..\..\cinder_0.8.5_vc2010\include";..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"..\..\..\cinder_0.8.5_vc2010\include";..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>cinder_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>"..\..\cinder_0.8.5_vc2010\lib";"..\..\cinder_0.8.5_vc2010\lib\msw"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"..\..\..\cinder_0.8.5_vc2010\lib";"..\..\..\cinder_0.8.5_vc2010\lib\msw"</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -77,7 +76,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Cinder\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\include;D:\Cinder\cinder_0.8.5_vc2010\boost;..\include;..\..\cinder_0.8.5_vc2010\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Cinder\cinder_0.8.5_vc2010\include;D:\Cinder\cinder_0.8.5_vc2010\boost</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;NOMINMAX;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -89,11 +88,11 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>"..\..\cinder_0.8.5_vc2010\include";..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"..\..\..\cinder_0.8.5_vc2010\include";..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>cinder.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\BulletCollision.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\BulletDynamics.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\BulletSoftBody.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\ConvexDecomposition.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\HACD.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\LinearMath.lib;..\..\cinder_0.8.5_vc2010\blocks\Cinder-Bullet-master\build\lib\vc10\OpenGLSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\cinder_0.8.5_vc2010\lib;..\..\cinder_0.8.5_vc2010\lib\msw</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cinder.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Cinder\cinder_0.8.5_vc2010\lib\msw;D:\Cinder\cinder_0.8.5_vc2010\lib</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
@@ -105,20 +104,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resources.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\DeferredRenderer.cpp" />
-    <ClCompile Include="..\src\PointLight.cpp" />
-    <ClCompile Include="..\src\TestApp.cpp" />
-    <ClCompile Include="..\src\Utilities.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\Resources.h" />
-    <ClInclude Include="..\src\BouncingBox.h" />
-    <ClInclude Include="..\src\DeferredRenderer.h" />
-    <ClInclude Include="..\src\PointLight.h" />
-    <ClInclude Include="..\src\Utilities.h" />
+    <ClCompile Include="src\ExampleSimple.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

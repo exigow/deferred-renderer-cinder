@@ -1,6 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Deferred", "Deferred.vcxproj", "{5B2258FC-5398-4E09-A6CA-085DDBD232D5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deferred-renderer", "deferred-renderer\deferred-renderer.vcxproj", "{5B2258FC-5398-4E09-A6CA-085DDBD232D5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "example-simple", "example-simple\example-simple.vcxproj", "{3C658725-DA25-46CA-A37A-623EE4DD4F86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,6 +14,10 @@ Global
 		{5B2258FC-5398-4E09-A6CA-085DDBD232D5}.Debug|Win32.Build.0 = Debug|Win32
 		{5B2258FC-5398-4E09-A6CA-085DDBD232D5}.Release|Win32.ActiveCfg = Release|Win32
 		{5B2258FC-5398-4E09-A6CA-085DDBD232D5}.Release|Win32.Build.0 = Release|Win32
+		{3C658725-DA25-46CA-A37A-623EE4DD4F86}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3C658725-DA25-46CA-A37A-623EE4DD4F86}.Debug|Win32.Build.0 = Debug|Win32
+		{3C658725-DA25-46CA-A37A-623EE4DD4F86}.Release|Win32.ActiveCfg = Release|Win32
+		{3C658725-DA25-46CA-A37A-623EE4DD4F86}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
