@@ -1,7 +1,8 @@
 #include "PointLight.h"
-#include "cinder/Vector.h"
-#include "cinder/Rand.h"
-#include "cinder/Color.h"
+
+#include <cinder/Vector.h>
+#include <cinder/Rand.h>
+#include <cinder/Color.h>
 
 PointLight::PointLight() {
 	this->position = Vec3f::zero();

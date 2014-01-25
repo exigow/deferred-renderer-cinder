@@ -32,8 +32,11 @@ public:
 	int getHeight();
 
 	void setTextureAlbedo(gl::Texture *texture);
+
 	void captureBegin();
 	void captureEnd();
+
+	PointLight *createLight(Vec3f position, float radius);
 
 	enum BufferTexture {
 		BUFTEX_ALBEDO_AND_DEPTH,

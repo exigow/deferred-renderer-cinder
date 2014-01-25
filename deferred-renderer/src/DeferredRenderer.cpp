@@ -5,7 +5,7 @@ DeferredRenderer::DeferredRenderer(int width, int height) {
 }
 
 DeferredRenderer::DeferredRenderer() {
-	this->setup(640, 480);
+	this->setup(640, 480); // Default size.
 }
 
 DeferredRenderer::~DeferredRenderer() {
@@ -24,11 +24,13 @@ void DeferredRenderer::setCamera(CameraPersp *camera) {
 	this->camera = camera;
 }
 
-// Setup deferred. Create FBOs.
+// Setup deferred.
 void DeferredRenderer::setup(int width, int height) {
+	// Set size.
 	this->width = width;
 	this->height = height;
 
+	// Setup FBOs.
 	deferredFBOFormat.setColorInternalFormat(GL_RGBA16F_ARB);
 	deferredFBOFormat.enableColorBuffer(true, 3);
 	deferredFBOFormat.setSamples(0);
@@ -127,30 +129,49 @@ void DeferredRenderer::captureEnd() {
 	gl::setViewport(viewportPrev);
 }
 
-void DeferredRenderer::renderLights() {
-	this->getBufferTexture(BUFTEX_ALBEDO_AND_DEPTH).bind(0);
-	this->getBufferTexture(BUFTEX_NORMAL).bind(1);
-	this->getBufferTexture(BUFTEX_POSITION).bind(2);
+PointLight *(DeferredRenderer::createLight)(Vec3f position, float radius) {
+	PointLight *light = new PointLight();
+	light->setPosition(position);
+	light->setRadius(radius);
+	lightList.push_back(light);
+	return light;
+}
 
+void DeferredRenderer::renderLights() {
+	// Bind buffers.
+	getBufferTexture(BUFTEX_ALBEDO_AND_DEPTH).bind(0);
+	getBufferTexture(BUFTEX_NORMAL).bind(1);
+	getBufferTexture(BUFTEX_POSITION).bind(2);
+
+	// Set viewport.
+	viewportPrev = gl::getViewport(); // Store prev.
 	gl::setViewport(lightFBO.getBounds());
-	gl::pushMatrices();
+
+	// Bind shader.
 	pointLightShader->bind();
 
+		// Uniforms.
 		pointLightShader->uniform("albedoAndDepthMap", 0);
 		pointLightShader->uniform("normalMap", 1);
 		pointLightShader->uniform("positionMap", 2);
-
 		pointLightShader->uniform("cameraPosition", camera->getEyePoint());
 
+		// Additive blending (enable).
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
 
+		// Bind FBO.
 		lightFBO.bindFramebuffer();
+
+			// Clear.
 			gl::clear(Color::black());
 
-			gl::pushMatrices();
-				gl::setMatrices(*camera);
+			// Camera matrix.
+			glPushMatrix();
+			gl::setMatrices(*camera);
+				// Draw light-cubes.
 				for (size_t i = 0; i < lightList.size(); i++) {
+					// Set uniform per light.
 					pointLightShader->uniform("lightPosition", camera->getModelViewMatrix().transformPointAffine(lightList[i]->getPosition()));
 					pointLightShader->uniform("lightRadius", lightList[i]->getRadius() * .5f);
 					pointLightShader->uniform("lightColor", lightList[i]->getColor());
@@ -159,12 +180,17 @@ void DeferredRenderer::renderLights() {
 						lightList[i]->getRadius(), 
 						lightList[i]->getRadius()));
 				}
-			gl::popMatrices();
+			glPopMatrix();
 
+		// Unbind FBO.
 		lightFBO.unbindFramebuffer();
 
+		// Stop blending.
 		glDisable(GL_BLEND);
 
+	// Unbind shader.
 	pointLightShader->unbind();
-	gl::popMatrices();
+
+	// Restore viewport.
+	gl::setViewport(viewportPrev);
 }
