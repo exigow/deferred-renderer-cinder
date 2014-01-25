@@ -18,7 +18,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v100</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -107,14 +107,10 @@
   <ItemGroup>
     <ClCompile Include=".\src\DeferredRenderer.cpp" />
     <ClCompile Include=".\src\PointLight.cpp" />
-    <ClCompile Include=".\src\TestApp.cpp" />
-    <ClCompile Include=".\src\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include=".\src\BouncingBox.h" />
     <ClInclude Include=".\src\DeferredRenderer.h" />
     <ClInclude Include=".\src\PointLight.h" />
-    <ClInclude Include=".\src\Utilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

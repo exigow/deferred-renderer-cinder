@@ -1,9 +1,9 @@
 #pragma once
 
-#include "cinder/Vector.h"
-#include "cinder/gl/GlslProg.h"
-#include "cinder/gl/Fbo.h"
-#include "cinder/Camera.h"
+#include <cinder/Vector.h>
+#include <cinder/gl/GlslProg.h>
+#include <cinder/gl/Fbo.h>
+#include <cinder/Camera.h>
 
 #include "PointLight.h"
 
@@ -31,6 +31,8 @@ public:
 	int getWidth();
 	int getHeight();
 
+	void setTextureAlbedo(gl::Texture *texture);
+
 	enum BufferTexture {
 		BUFTEX_ALBEDO_AND_DEPTH,
 		BUFTEX_NORMAL,
@@ -42,12 +44,10 @@ public:
 
 private:
 	gl::Fbo::Format deferredFBOFormat, lightFBOFormat;
-
 	void setup(int width, int height);
-
 	CameraPersp *camera;
-	
 	int width, height;
+	gl::Texture *texture;
 };
 
 	

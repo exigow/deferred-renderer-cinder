@@ -74,14 +74,19 @@ gl::Texture DeferredRenderer::getBufferTexture(DeferredRenderer::BufferTexture t
 	return fbo->getTexture(fromBuffer);
 }
 
+
+void DeferredRenderer::setTextureAlbedo(gl::Texture *texture) {
+	this->texture = texture;
+}
+
+
 void DeferredRenderer::renderLights() {
 	this->getBufferTexture(BUFTEX_ALBEDO_AND_DEPTH).bind(0);
 	this->getBufferTexture(BUFTEX_NORMAL).bind(1);
 	this->getBufferTexture(BUFTEX_POSITION).bind(2);
 
-	//glLoadIdentity();
-	gl::pushMatrices();
 	gl::setViewport(lightFBO.getBounds());
+	gl::pushMatrices();
 	pointLightShader->bind();
 
 		pointLightShader->uniform("albedoAndDepthMap", 0);

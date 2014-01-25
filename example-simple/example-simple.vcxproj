@@ -76,7 +76,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Cinder\cinder_0.8.5_vc2010\include;D:\Cinder\cinder_0.8.5_vc2010\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Cinder\deferred-renderer-cinder\deferred-renderer\src;D:\Cinder\cinder_0.8.5_vc2010\include;D:\Cinder\cinder_0.8.5_vc2010\boost</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;NOMINMAX;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -91,8 +91,8 @@
       <AdditionalIncludeDirectories>"..\..\..\cinder_0.8.5_vc2010\include";..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>cinder.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\Cinder\cinder_0.8.5_vc2010\lib\msw;D:\Cinder\cinder_0.8.5_vc2010\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cinder.lib;deferred-renderer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Cinder\deferred-renderer-cinder\Release;D:\Cinder\cinder_0.8.5_vc2010\lib\msw;D:\Cinder\cinder_0.8.5_vc2010\lib</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
