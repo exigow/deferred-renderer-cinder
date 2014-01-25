@@ -32,6 +32,8 @@ public:
 	int getHeight();
 
 	void setTextureAlbedo(gl::Texture *texture);
+	void captureBegin();
+	void captureEnd();
 
 	enum BufferTexture {
 		BUFTEX_ALBEDO_AND_DEPTH,
@@ -48,6 +50,7 @@ private:
 	CameraPersp *camera;
 	int width, height;
 	gl::Texture *texture;
+	Area viewportPrev;
 };
 
 	

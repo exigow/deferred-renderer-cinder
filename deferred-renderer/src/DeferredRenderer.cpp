@@ -79,6 +79,53 @@ void DeferredRenderer::setTextureAlbedo(gl::Texture *texture) {
 	this->texture = texture;
 }
 
+void DeferredRenderer::captureBegin() {
+	// Bind deferred FBO.
+	deferredFBO.bindFramebuffer();
+
+	// Set viewport as gbuffer size.
+	viewportPrev = gl::getViewport(); // Store prev viewport.
+	gl::setViewport(Area(0, 0, width, height));
+
+	// Bind albedo tex. as 0.
+	texture->bind(0);
+
+	// Bind shader and set uniforms.
+	deferredShader->bind();
+	deferredShader->uniform("mTexture", 0); 
+
+	// Clear buffer.
+	gl::clear(Color(.5f, 0.0f, 0.0f));
+
+	// Push, set camera matrix.
+	glPushMatrix();
+	gl::setMatrices(*camera);
+
+	// Enable depth.
+	gl::enableDepthRead();
+	gl::enableDepthWrite();
+}
+
+void DeferredRenderer::captureEnd() {
+	// Disable depth.
+	gl::disableDepthRead();
+	gl::disableDepthWrite();
+
+	// Pop camera matrix.
+	glPopMatrix();
+
+	// Undind albedo.
+	texture->unbind();
+
+	// Unbind shader.
+	deferredShader->unbind();
+
+	// Unbind deferred FBO.
+	deferredFBO.unbindFramebuffer();
+
+	// Restore viewport.
+	gl::setViewport(viewportPrev);
+}
 
 void DeferredRenderer::renderLights() {
 	this->getBufferTexture(BUFTEX_ALBEDO_AND_DEPTH).bind(0);
