@@ -4,12 +4,16 @@
 #include <cinder/gl/GlslProg.h>
 #include <cinder/gl/Fbo.h>
 #include <cinder/Camera.h>
+#include <cinder/Timer.h>
 
 #include "PointLight.h"
+#include "CubeMap.h"
 
 #include <vector>
 
 using namespace ci;
+
+const int CUBE_MAP_LOC = 4;
 
 class DeferredRenderer
 {
@@ -19,68 +23,56 @@ public:
 
 	~DeferredRenderer();
 
-	gl::Fbo deferredFBO, lightFBO;
-
-	gl::GlslProg *pointLightShader, *deferredShader;
-
-	std::vector<PointLight*> lightList;
+	gl::GlslProg *pointLightShader, *deferredShader, *composeShader;
 
 	void setCamera(CameraPersp *camera);
+
 	void renderLights();
+	void compose();
 
 	int getWidth();
 	int getHeight();
+	int getNumberOfLights();
 
 	void setTextureAlbedo(gl::Texture *texture);
+	void setTextureEnviro(gl::Texture *texture);
+	void setCubeMap(CubeMap *map);
 
 	void captureBegin();
 	void captureEnd();
 
+	double getRenderLightsTime();
+	double getCaptureTime();
+
+	std::vector<PointLight*> getLights();
+
 	PointLight *createLight(Vec3f position, float radius);
 
 	enum BufferTexture {
-		BUFTEX_ALBEDO_AND_DEPTH,
-		BUFTEX_NORMAL,
-		BUFTEX_POSITION,
-		BUFTEX_LIGHT
+		ALBEDO_AND_DEPTH,
+		NORMAL,
+		POSITION,
+		LIGHT,
+		ENVIRO,
+		COMPOSITION
 	};
 
 	gl::Texture getBufferTexture(BufferTexture texture);
 
 private:
-	gl::Fbo::Format deferredFBOFormat, lightFBOFormat;
+	gl::Fbo::Format deferredFBOFormat, lightFBOFormat, compositionFBOFormat;
+	gl::Fbo deferredFBO, lightFBO, compositionFBO;
+
 	void setup(int width, int height);
 	CameraPersp *camera;
 	int width, height;
-	gl::Texture *texture;
+	gl::Texture *albedoTexture, *enviroTexture;
+
+	CubeMap *cubeMap;
+
 	Area viewportPrev;
-};
-
 	
-
-
-	// Preview
-	/*switch (preview) {
-		case fboPreview::LIGHTS: {
-			gl::setViewport(viewport);
-			gl::pushModelView();
-			gl::draw(deferredRenderer->lightFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
-			gl::popModelView();
-			break;
-		}
-		case fboPreview::GBUFFER: {
-			deferredRenderer->deferredFBO.getTexture(0).bind(0);
-			deferredRenderer->deferredFBO.getTexture(1).bind(1);
-			deferredRenderer->deferredFBO.getTexture(2).bind(2);
-			gl::setViewport(viewport);
-			deferredRenderer->deferredPreviewShader->bind();
-				deferredRenderer->deferredPreviewShader->uniform("frag0", 0);
-				deferredRenderer->deferredPreviewShader->uniform("frag1", 1);
-				deferredRenderer->deferredPreviewShader->uniform("frag2", 2);
-				gl::pushMatrices();
-					gl::draw(deferredRenderer->deferredFBO.getTexture(0), Rectf(0, 0, (float)size::windowWidth, (float)size::windowHeight));
-				gl::popMatrices();
-			deferredRenderer->deferredPreviewShader->unbind();
-			break;
-		}
-	}*/
+	std::vector<PointLight*> lightList;
+	Timer tempTime;
+	double lightsRenderTime, captureTime;
+};

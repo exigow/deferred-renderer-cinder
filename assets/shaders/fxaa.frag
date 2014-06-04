@@ -1,5 +1,7 @@
 #version 110
 
+// Based on: http://horde3d.org/wiki/index.php5?title=Shading_Technique_-_FXAA
+
 uniform sampler2D source;
 uniform vec2 frameBufSize;
 

@@ -84,6 +84,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -107,10 +108,12 @@
   <ItemGroup>
     <ClCompile Include=".\src\DeferredRenderer.cpp" />
     <ClCompile Include=".\src\PointLight.cpp" />
+    <ClCompile Include="src\CubeMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\src\DeferredRenderer.h" />
     <ClInclude Include=".\src\PointLight.h" />
+    <ClInclude Include="src\CubeMap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
