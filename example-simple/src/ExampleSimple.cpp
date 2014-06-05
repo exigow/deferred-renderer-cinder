@@ -29,11 +29,11 @@ public:
 private:
 	CameraPersp camera;
 	MayaCamUI mayaCamera;
-	gl::Texture texture, enviroTex;
+	gl::Texture textureAlbedo, textureNormal, enviroTex;
 	Area viewport;
 
 	DeferredRenderer *deferred;
-	PointLight *movingLight;
+	PointLight *movingLightRed, *movingLightGreen, *movingLightBlue;
 	CubeMap *cubeMap;
 	TriMesh mesh;
 	gl::VboMesh vbo;
@@ -53,7 +53,9 @@ void DeferredExampleSimple::setup() {
 	mayaCamera.setCurrentCam(camera);
 
 	// Sample texture.
-	texture = gl::Texture(loadImage(loadAsset("bunny_albedo.png")));
+	textureAlbedo = gl::Texture(loadImage(loadAsset("bunny_albedo.png")));
+	textureNormal = gl::Texture(loadImage(loadAsset("bunny_normal.png")));
+
 	enviroTex = gl::Texture(loadImage(loadAsset("enviro.png")));
 
 	ObjLoader loader(loadAsset("bunny.obj"));
@@ -69,7 +71,6 @@ void DeferredExampleSimple::setup() {
 	deferred->composeShader = new gl::GlslProg(loadAsset("shaders/screenSpace.vert"), loadAsset("shaders/compose.frag"));
 
 	// Set enviro and cube.
-	deferred->setTextureEnviro(&enviroTex);
 	deferred->setCubeMap(new CubeMap(GLsizei(512), GLsizei(512),
 		Surface8u(loadImage(loadAsset("cube/x_plus.png"))),
 		Surface8u(loadImage(loadAsset("cube/y_plus.png"))),
@@ -79,18 +80,31 @@ void DeferredExampleSimple::setup() {
 		Surface8u(loadImage(loadAsset("cube/z_minus.png")))));
 
 	// Create lights.
-	deferred->createLight(Vec3f(8.0f, 0.0f, 0.0f), 16.0f);
+	/*deferred->createLight(Vec3f(8.0f, 0.0f, 0.0f), 16.0f);
 	deferred->createLight(Vec3f(-8.0f, 0.0f, 0.0f), 16.0f);
 	deferred->createLight(Vec3f(0.0f, 0.0f, 8.0f), 16.0f);
-	deferred->createLight(Vec3f(0.0f, 0.0f, -8.0f), 16.0f);
-	movingLight = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 32.0f);
+	deferred->createLight(Vec3f(0.0f, 0.0f, -8.0f), 16.0f);*/
+
+	movingLightRed = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 128.0f);
+	movingLightGreen = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 128.0f);
+	movingLightBlue = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 128.0f);
 }
 
 void DeferredExampleSimple::update() {
-	movingLight->setPosition(
+	movingLightRed->setPosition(
 		(float)cos(getElapsedSeconds()) * 32.0f, 
 		0.0f, 
 		(float)sin(getElapsedSeconds()) * 32.0f);
+
+	movingLightGreen->setPosition(
+		(float)cos(getElapsedSeconds() + 2) * 32.0f, 
+		0.0f, 
+		(float)sin(getElapsedSeconds() + 2) * 32.0f);
+
+	movingLightBlue->setPosition(
+		(float)cos(getElapsedSeconds() + 4) * 32.0f, 
+		0.0f, 
+		(float)sin(getElapsedSeconds() + 4) * 32.0f);
 }
 
 void DeferredExampleSimple::draw() {
@@ -101,12 +115,13 @@ void DeferredExampleSimple::draw() {
 	gl::clear(Color(0.125f, 0.0f, 0.0f));
 
 	// Deferred capturing.
-	deferred->setTextureAlbedo(&texture);
+	deferred->setTextureAlbedo(&textureAlbedo);
+	deferred->setTextureNormal(&textureNormal);
 	deferred->captureBegin();
-	/*for (size_t i = 0; i < deferred->getLights().size(); i++) {
+	for (size_t i = 0; i < deferred->getLights().size(); i++) {
 		Vec3f _v = deferred->getLights()[i]->getPosition();
-		gl::drawSphere(_v, .25f, 4);
-	}*/
+		gl::drawSphere(_v, 1.0f, 16);
+	}
 	//gl::drawCube(ci::Vec3f(0.0f, -2.0f, 0.0f), ci::Vec3f(64.0f, 1.0f, 64.0f));
 	//gl::drawSphere(Vec3f(0.0f, 0.0f, 0.0f), 16.0f, 128);
 	//gl::drawTorus(8.0f, 4.0f, 64, 64);
@@ -124,7 +139,7 @@ void DeferredExampleSimple::draw() {
 	deferred->compose();
 
 	// Finally, draw.
-	gl::draw(deferred->getBufferTexture(DeferredRenderer::ENVIRO), Rectf(0.0f, 0.0f, (float)getWindowWidth(), (float)getWindowHeight()));
+	gl::draw(deferred->getBufferTexture(DeferredRenderer::LIGHT), Rectf(0.0f, 0.0f, (float)getWindowWidth(), (float)getWindowHeight()));
 
 	// Draw debug text.
 	gl::enableAlphaBlending();

@@ -21,9 +21,25 @@ void main() {
 	vec2 uv = pos.xy / pos.w * .5 + .5;
 	
 	vec3 positionSource = texture2D(positionMap, uv).rgb;
+	
+	vec3 localPosition = lightTransformedPosition - positionSource;
+	float distance = length(localPosition);
+	if (distance > lightRadius) {
+		discard;
+	}
+	localPosition /= distance;
+	
 	vec3 normalSource = texture2D(normalMap, uv).rgb;
+	
+	vec3 halfVector = normalize(localPosition + normalize(-positionSource));
+	
+	float NdotL = dot(normalSource, localPosition);
 
-    gl_FragColor = vec4(vec3(normalSource), 1);
+	float attenuation = 1 - (distance / lightRadius);
+
+	float specular = pow(max(dot(halfVector, normalSource), 0.0), 32.0);
+	
+    gl_FragColor = vec4(lightColor * vec3((NdotL + specular) * attenuation), 1);
 }
 
 

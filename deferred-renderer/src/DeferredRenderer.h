@@ -35,7 +35,7 @@ public:
 	int getNumberOfLights();
 
 	void setTextureAlbedo(gl::Texture *texture);
-	void setTextureEnviro(gl::Texture *texture);
+	void setTextureNormal(gl::Texture *texture);
 	void setCubeMap(CubeMap *map);
 
 	void captureBegin();
@@ -66,7 +66,7 @@ private:
 	void setup(int width, int height);
 	CameraPersp *camera;
 	int width, height;
-	gl::Texture *albedoTexture, *enviroTexture;
+	gl::Texture *textureAlbedo, *textureNormal;
 
 	CubeMap *cubeMap;
 

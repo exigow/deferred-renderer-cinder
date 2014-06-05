@@ -94,11 +94,11 @@ gl::Texture DeferredRenderer::getBufferTexture(DeferredRenderer::BufferTexture t
 
 
 void DeferredRenderer::setTextureAlbedo(gl::Texture *texture) {
-	this->albedoTexture = texture;
+	this->textureAlbedo = texture;
 }
 
-void DeferredRenderer::setTextureEnviro(gl::Texture *texture) {
-	this->enviroTexture = texture;
+void DeferredRenderer::setTextureNormal(gl::Texture *texture) {
+	this->textureNormal = texture;
 }
 
 void DeferredRenderer::setCubeMap(CubeMap *map) {
@@ -117,14 +117,14 @@ void DeferredRenderer::captureBegin() {
 	gl::setViewport(Area(0, 0, width, height));
 
 	// Bind textures/else.
-	albedoTexture->bind(0);
-	enviroTexture->bind(1);
+	textureAlbedo->bind(0);
+	textureNormal->bind(1);
 	cubeMap->bindMulti(CUBE_MAP_LOC);
 
 	// Bind shader and set uniforms.
 	deferredShader->bind();
-	deferredShader->uniform("albedoTexture", 0); 
-	deferredShader->uniform("enviroTexture", 1); 
+	deferredShader->uniform("textureAlbedo", 0); 
+	deferredShader->uniform("textureNormal", 1); 
 	deferredShader->uniform("cubeMap", CUBE_MAP_LOC);
 	deferredShader->uniform("cameraDirection", camera->getViewDirection());
 	deferredShader->uniform("cameraEyePoint", camera->getEyePoint());
@@ -153,8 +153,8 @@ void DeferredRenderer::captureEnd() {
 	glPopMatrix();
 
 	// Undind albedo.
-	albedoTexture->unbind();
-	enviroTexture->unbind();
+	textureAlbedo->unbind();
+	textureNormal->unbind();
 
 	// Unbind shader.
 	deferredShader->unbind();
