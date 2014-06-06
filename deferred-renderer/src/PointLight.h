@@ -11,6 +11,8 @@ public:
 	~PointLight(void);
 
 	Vec3f getColor();
+	void setColor(Vec3f color);
+	void setColorHSV(Vec3f colorHSV);
 	void randomizeColor();
 
 	void setPosition(float x, float y, float z);

@@ -29,15 +29,15 @@ void main() {
 	}
 	localPosition /= distance;
 	
-	vec3 normalSource = texture2D(normalMap, uv).rgb;
+	vec4 normal = texture2D(normalMap, uv);
 	
 	vec3 halfVector = normalize(localPosition + normalize(-positionSource));
 	
-	float NdotL = dot(normalSource, localPosition);
+	float NdotL = dot(normal.rgb, localPosition);
 
 	float attenuation = 1 - (distance / lightRadius);
 
-	float specular = pow(max(dot(halfVector, normalSource), 0.0), 32.0);
+	float specular = pow(max(dot(halfVector, normal.rgb), 0.0) * normal.a, 16.0);  //  
 	
     gl_FragColor = vec4(lightColor * vec3((NdotL + specular) * attenuation), 1);
 }

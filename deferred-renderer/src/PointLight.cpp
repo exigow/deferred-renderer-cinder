@@ -21,6 +21,18 @@ void PointLight::randomizeColor() {
 	delete _col;
 }
 
+void PointLight::setColor(Vec3f color) {
+	this->color.set(color);
+}
+
+void PointLight::setColorHSV(Vec3f colorHSV) {
+	Color *_col = new Color(CM_HSV, colorHSV);
+	this->color.x = _col->r;
+	this->color.y = _col->g;
+	this->color.z = _col->b;
+	delete _col;
+}
+
 Vec3f PointLight::getColor() {
 	return color;
 }

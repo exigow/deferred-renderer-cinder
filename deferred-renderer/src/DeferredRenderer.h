@@ -36,6 +36,8 @@ public:
 
 	void setTextureAlbedo(gl::Texture *texture);
 	void setTextureNormal(gl::Texture *texture);
+	void setTextureSpecular(gl::Texture *texture);
+
 	void setCubeMap(CubeMap *map);
 
 	void captureBegin();
@@ -66,7 +68,7 @@ private:
 	void setup(int width, int height);
 	CameraPersp *camera;
 	int width, height;
-	gl::Texture *textureAlbedo, *textureNormal;
+	gl::Texture *textureAlbedo, *textureNormal, *textureSpecular;
 
 	CubeMap *cubeMap;
 

@@ -101,6 +101,10 @@ void DeferredRenderer::setTextureNormal(gl::Texture *texture) {
 	this->textureNormal = texture;
 }
 
+void DeferredRenderer::setTextureSpecular(gl::Texture *texture) {
+	this->textureSpecular = texture;
+}
+
 void DeferredRenderer::setCubeMap(CubeMap *map) {
 	this->cubeMap = map;
 }
@@ -119,12 +123,14 @@ void DeferredRenderer::captureBegin() {
 	// Bind textures/else.
 	textureAlbedo->bind(0);
 	textureNormal->bind(1);
+	textureSpecular->bind(2);
 	cubeMap->bindMulti(CUBE_MAP_LOC);
 
 	// Bind shader and set uniforms.
 	deferredShader->bind();
 	deferredShader->uniform("textureAlbedo", 0); 
 	deferredShader->uniform("textureNormal", 1); 
+	deferredShader->uniform("textureSpecular", 2); 
 	deferredShader->uniform("cubeMap", CUBE_MAP_LOC);
 	deferredShader->uniform("cameraDirection", camera->getViewDirection());
 	deferredShader->uniform("cameraEyePoint", camera->getEyePoint());
@@ -155,6 +161,7 @@ void DeferredRenderer::captureEnd() {
 	// Undind albedo.
 	textureAlbedo->unbind();
 	textureNormal->unbind();
+	textureSpecular->unbind();
 
 	// Unbind shader.
 	deferredShader->unbind();
@@ -282,18 +289,24 @@ void DeferredRenderer::compose() {
 	gl::setViewport(compositionFBO.getBounds());
 
 	deferredFBO.getTexture(0).bind(0);
-	lightFBO.getTexture(0).bind(1);
+	deferredFBO.getTexture(1).bind(1);
+	deferredFBO.getTexture(2).bind(2);
+	deferredFBO.getTexture(3).bind(3);
+	lightFBO.getTexture(0).bind(4);
 
 	compositionFBO.bindFramebuffer();
 
 		composeShader->bind();
-		composeShader->uniform("albedoMap", 0);
-		composeShader->uniform("lightMap", 1);
+		composeShader->uniform("albedoAndDepthMap", 0);
+		composeShader->uniform("normalMap", 1);
+		composeShader->uniform("positionMap", 2);
+		composeShader->uniform("enviroMap", 3);
+		composeShader->uniform("lightMap", 4);
 
 		glPushMatrix();
-			/*glScalef(
+			glScalef(
 				(float)compositionFBO.getTexture().getWidth(), 
-				(float)compositionFBO.getTexture().getHeight(), 0);*/
+				(float)compositionFBO.getTexture().getHeight(), 1.0f);
 			glBegin(GL_QUADS);
 				glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 1.0f); // 0, 1
 				glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f); // 1, 1

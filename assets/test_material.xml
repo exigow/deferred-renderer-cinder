@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<material>
+	<name>bunny mat</name>
+	<albedo>bunny_albedo.png</albedo>
+	<normal>bunny_normal.png</normal>
+	<specular>bunny_specular.png</specular>
+	<gloss>bunny_specular.png</gloss>
+</material>
