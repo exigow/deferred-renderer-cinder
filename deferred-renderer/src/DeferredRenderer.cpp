@@ -30,6 +30,8 @@ void DeferredRenderer::setup(int width, int height) {
 	this->width = width;
 	this->height = height;
 
+	gl::Fbo::Format deferredFBOFormat, lightFBOFormat, compositionFBOFormat;
+
 	// Setup FBOs.
 	deferredFBOFormat.setColorInternalFormat(GL_RGBA16F_ARB);
 	deferredFBOFormat.enableColorBuffer(true, 4);
@@ -82,7 +84,7 @@ gl::Texture DeferredRenderer::getBufferTexture(DeferredRenderer::BufferTexture t
 			fbo = &lightFBO;
 			fromBuffer = 0;
 		} else {
-			if (texture == COMPOSITION) {
+			if (texture == MIXED) {
 				fbo = &compositionFBO;
 				fromBuffer = 0;
 			} 
@@ -105,6 +107,17 @@ void DeferredRenderer::setTextureSpecular(gl::Texture *texture) {
 	this->textureSpecular = texture;
 }
 
+void DeferredRenderer::setTextureGloss(gl::Texture *texture) {
+	this->textureGloss = texture;
+}
+
+void DeferredRenderer::setMaterial(Material *material) {
+	setTextureAlbedo(&material->albedo);
+	setTextureNormal(&material->normal);
+	setTextureSpecular(&material->specular);
+	setTextureGloss(&material->gloss);
+}
+
 void DeferredRenderer::setCubeMap(CubeMap *map) {
 	this->cubeMap = map;
 }
@@ -124,6 +137,7 @@ void DeferredRenderer::captureBegin() {
 	textureAlbedo->bind(0);
 	textureNormal->bind(1);
 	textureSpecular->bind(2);
+	textureGloss->bind(3);
 	cubeMap->bindMulti(CUBE_MAP_LOC);
 
 	// Bind shader and set uniforms.
@@ -131,6 +145,8 @@ void DeferredRenderer::captureBegin() {
 	deferredShader->uniform("textureAlbedo", 0); 
 	deferredShader->uniform("textureNormal", 1); 
 	deferredShader->uniform("textureSpecular", 2); 
+	deferredShader->uniform("textureGloss", 3); 
+
 	deferredShader->uniform("cubeMap", CUBE_MAP_LOC);
 	deferredShader->uniform("cameraDirection", camera->getViewDirection());
 	deferredShader->uniform("cameraEyePoint", camera->getEyePoint());

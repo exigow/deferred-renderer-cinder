@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<cubemap>
+	<name>my cubemap</name>
+	
+	<width>256</width>
+	<height>256</height>
+	
+	<xpos>cube/xpos.png</xpos>
+	<ypos>cube/ypos.png</ypos>
+	<zpos>cube/zpos.png</zpos>
+	
+	<xneg>cube/xneg.png</xneg>
+	<yneg>cube/yneg.png</yneg>
+	<zneg>cube/zneg.png</zneg>
+</cubemap>

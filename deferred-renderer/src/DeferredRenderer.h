@@ -8,6 +8,7 @@
 
 #include "PointLight.h"
 #include "CubeMap.h"
+#include "Material.h"
 
 #include <vector>
 
@@ -37,6 +38,9 @@ public:
 	void setTextureAlbedo(gl::Texture *texture);
 	void setTextureNormal(gl::Texture *texture);
 	void setTextureSpecular(gl::Texture *texture);
+	void setTextureGloss(gl::Texture *texture);
+
+	void setMaterial(Material *material);
 
 	void setCubeMap(CubeMap *map);
 
@@ -56,19 +60,18 @@ public:
 		POSITION,
 		LIGHT,
 		ENVIRO,
-		COMPOSITION
+		MIXED
 	};
 
 	gl::Texture getBufferTexture(BufferTexture texture);
 
 private:
-	gl::Fbo::Format deferredFBOFormat, lightFBOFormat, compositionFBOFormat;
-	gl::Fbo deferredFBO, lightFBO, compositionFBO;
+	gl::Fbo deferredFBO, lightFBO;
 
 	void setup(int width, int height);
 	CameraPersp *camera;
 	int width, height;
-	gl::Texture *textureAlbedo, *textureNormal, *textureSpecular;
+	gl::Texture *textureAlbedo, *textureNormal, *textureSpecular, *textureGloss;
 
 	CubeMap *cubeMap;
 

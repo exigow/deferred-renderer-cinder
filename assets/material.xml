@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<material>
+	<name>metal test material</name>
+	<albedo>steel_d.png</albedo>
+	<normal>steel_n.png</normal>
+	<specular>steel_s.png</specular>
+	<gloss>steel_g.png</gloss>
+</material>

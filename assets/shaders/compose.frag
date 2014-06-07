@@ -6,7 +6,6 @@ uniform sampler2D positionMap;
 uniform sampler2D enviroMap;
 uniform sampler2D lightMap;
 
-
 void main() {
 	vec2 uv = gl_TexCoord[0].st;
 	vec4 albedoAndDepth = texture2D(albedoAndDepthMap, uv);
@@ -15,5 +14,11 @@ void main() {
 	vec4 enviro = texture2D(enviroMap, uv);
 	vec4 light = texture2D(lightMap, uv);
 	
-	gl_FragColor = vec4(light.rgb * albedoAndDepth.rgb, 1);
+	float fresnel = 1 - dot(normal.rgb, vec3(0, 0, 1));
+	if (fresnel == 1) {
+		fresnel = 0;
+	}
+	enviro.rgb += pow(fresnel, 4);
+	
+	gl_FragColor = vec4(enviro.rgb + light.rgb, 1);
 }

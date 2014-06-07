@@ -109,11 +109,13 @@
     <ClCompile Include=".\src\DeferredRenderer.cpp" />
     <ClCompile Include=".\src\PointLight.cpp" />
     <ClCompile Include="src\CubeMap.cpp" />
+    <ClCompile Include="src\Material.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\src\DeferredRenderer.h" />
     <ClInclude Include=".\src\PointLight.h" />
     <ClInclude Include="src\CubeMap.h" />
+    <ClInclude Include="src\Material.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
