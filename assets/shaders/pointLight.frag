@@ -37,9 +37,9 @@ void main() {
 
 	float attenuation = 1 - (distance / lightRadius);
 
-	float specular = pow(max(dot(halfVector, normal.rgb), 0.0) + .025, 64);
+	float specular = pow((max(dot(halfVector, normal.rgb), 0.0) + .025), 64); //  * normal.a
 
-    gl_FragColor = vec4(lightColor * vec3((NdotL + specular) * attenuation), 1);
+    gl_FragColor = vec4(lightColor * vec3((NdotL + specular) * attenuation) * normal.a, 1);
 	
 	//gl_FragColor = vec4(lightColor * vec3(specular * attenuation), 1);
 }

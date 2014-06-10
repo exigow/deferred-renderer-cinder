@@ -30,29 +30,30 @@ void DeferredRenderer::setup(int width, int height) {
 	this->width = width;
 	this->height = height;
 
-	gl::Fbo::Format deferredFBOFormat, lightFBOFormat, compositionFBOFormat;
-
 	// Setup FBOs.
-	deferredFBOFormat.setColorInternalFormat(GL_RGBA16F_ARB);
-	deferredFBOFormat.enableColorBuffer(true, 4);
-	deferredFBOFormat.setSamples(0);
-	deferredFBOFormat.setCoverageSamples(0);
-	deferredFBO = gl::Fbo(width, height, deferredFBOFormat);
+	gl::Fbo::Format gbufferFormat;
+	gbufferFormat.setColorInternalFormat(GL_RGBA16F_ARB);
+	gbufferFormat.enableColorBuffer(true, 4);
+	gbufferFormat.setSamples(0);
+	gbufferFormat.setCoverageSamples(0);
+	deferredFBO = gl::Fbo(width, height, gbufferFormat);
 		deferredFBO.getTexture(0).setFlipped(true);
 		deferredFBO.getTexture(1).setFlipped(true);
 		deferredFBO.getTexture(2).setFlipped(true);
 		deferredFBO.getTexture(3).setFlipped(true);
 
-	lightFBOFormat.setColorInternalFormat(GL_RGB8);
-	lightFBOFormat.setSamples(0);
-	lightFBOFormat.setCoverageSamples(0);
-	lightFBO = gl::Fbo(width, height, lightFBOFormat);
+	gl::Fbo::Format lightFormat;
+	lightFormat.setColorInternalFormat(GL_RGB8);
+	lightFormat.setSamples(0);
+	lightFormat.setCoverageSamples(0);
+	lightFBO = gl::Fbo(width, height, lightFormat);
 		lightFBO.getTexture().setFlipped(true);
 
-	compositionFBOFormat.setColorInternalFormat(GL_RGB8);
-	compositionFBOFormat.setSamples(0);
-	compositionFBOFormat.setCoverageSamples(0);
-	compositionFBO = gl::Fbo(width, height, compositionFBOFormat);
+	gl::Fbo::Format compositionFormat;
+	compositionFormat.setColorInternalFormat(GL_RGB8);
+	compositionFormat.setSamples(0);
+	compositionFormat.setCoverageSamples(0);
+	compositionFBO = gl::Fbo(width, height, compositionFormat);
 		compositionFBO.getTexture().setFlipped(false);
 }
 
@@ -83,11 +84,10 @@ gl::Texture DeferredRenderer::getBufferTexture(DeferredRenderer::BufferTexture t
 		if (texture == LIGHT) {
 			fbo = &lightFBO;
 			fromBuffer = 0;
-		} else {
-			if (texture == MIXED) {
-				fbo = &compositionFBO;
-				fromBuffer = 0;
-			} 
+		} 
+		if (texture == MIXED) {
+			fbo = &compositionFBO;
+			fromBuffer = 0;
 		}
 	}
 
@@ -300,6 +300,20 @@ std::vector<PointLight*> DeferredRenderer::getLights() {
 	return lightList;
 }
 
+void DeferredRenderer::drawScreenQuad() {
+	glPushMatrix();
+		glScalef(
+			(float)compositionFBO.getTexture().getWidth(), 
+			(float)compositionFBO.getTexture().getHeight(), 1.0f);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 1.0f); // 0, 1
+			glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f); // 1, 1
+			glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 0.0f); // 1, 0
+			glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f); // 0, 0
+		glEnd();
+	glPopMatrix(); 
+}
+
 void DeferredRenderer::compose() {
 	viewportPrev = gl::getViewport();
 	gl::setViewport(compositionFBO.getBounds());
@@ -319,17 +333,7 @@ void DeferredRenderer::compose() {
 		composeShader->uniform("enviroMap", 3);
 		composeShader->uniform("lightMap", 4);
 
-		glPushMatrix();
-			glScalef(
-				(float)compositionFBO.getTexture().getWidth(), 
-				(float)compositionFBO.getTexture().getHeight(), 1.0f);
-			glBegin(GL_QUADS);
-				glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 1.0f); // 0, 1
-				glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f); // 1, 1
-				glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 0.0f); // 1, 0
-				glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f); // 0, 0
-			glEnd();
-		glPopMatrix(); 
+		drawScreenQuad();
 
 		composeShader->unbind();
 

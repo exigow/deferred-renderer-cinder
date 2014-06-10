@@ -34,6 +34,7 @@ private:
 	Material *material;
 
 	DeferredRenderer *deferred;
+	gl::GlslProg *fxaaShader;
 	PointLight *movingLightRed, *movingLightGreen, *movingLightBlue;
 	CubeMap *cubeMap;
 	TriMesh mesh;
@@ -41,9 +42,10 @@ private:
 };
 
 void DeferredExampleSimple::prepareSettings(Settings *settings) {
-	settings->setWindowSize(800, 600);
+	settings->setWindowSize(1024, 600);
 	settings->setFrameRate(60.0f);
 	settings->setTitle("Deferred example");
+	//settings->enableConsoleWindow();
 }
 
 void DeferredExampleSimple::setup() {
@@ -61,21 +63,22 @@ void DeferredExampleSimple::setup() {
 	vbo = gl::VboMesh(mesh);
 
 	// Deferred setup.
-	deferred = new DeferredRenderer(800, 600);
+	deferred = new DeferredRenderer(1024, 600);
 	deferred->setCamera(&camera);
 	// Set shaders.
 	deferred->deferredShader = new gl::GlslProg(loadAsset("shaders/deferred.vert"), loadAsset("shaders/deferred.frag")); 
 	deferred->pointLightShader = new gl::GlslProg(loadAsset("shaders/pointLight.vert"), loadAsset("shaders/pointLight.frag"));
 	deferred->composeShader = new gl::GlslProg(loadAsset("shaders/screenSpace.vert"), loadAsset("shaders/compose.frag"));
+	fxaaShader = new gl::GlslProg(loadAsset("shaders/screenSpace.vert"), loadAsset("shaders/fxaa.frag"));
 
 	// Set enviro and cube.
 	deferred->setCubeMap(new CubeMap(loadAsset("cubemap.xml")));
 
-	movingLightRed = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 64.0f);
+	movingLightRed = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 96.0f);
 	movingLightRed->setColor(Vec3f(1.0f, .5f, .5f));
-	movingLightGreen = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 64.0f);
+	movingLightGreen = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 96.0f);
 	movingLightGreen->setColor(Vec3f(.5f, 1.0f, .5f));
-	movingLightBlue = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 64.0f);
+	movingLightBlue = deferred->createLight(Vec3f(0.0f, 0.0f, 0.0f), 96.0f);
 	movingLightBlue->setColor(Vec3f(.5f, .5f, 1.0f));
 }
 
@@ -111,7 +114,17 @@ void DeferredExampleSimple::draw() {
 		Vec3f _v = deferred->getLights()[i]->getPosition();
 		gl::drawSphere(_v, 0.5f, 8);
 	}
-	gl::draw(vbo);
+
+	for (int ix = -1; ix <= 1; ix++) {
+		for (int iz = -1; iz <= 1; iz++) {
+			glPushMatrix();
+			gl::translate((float)ix * 32, 0, (float)iz * 32);
+			gl::draw(vbo);
+			glPopMatrix();
+		}
+	}
+	
+	//gl::drawSphere(Vec3f::zero(), 8, 32);
 
 	deferred->captureEnd();
 
@@ -122,7 +135,12 @@ void DeferredExampleSimple::draw() {
 	deferred->compose();
 
 	// Finally, draw.
+	deferred->getBufferTexture(DeferredRenderer::MIXED).bind(0);
+	fxaaShader->bind();
+	fxaaShader->uniform("source", 0);
+	fxaaShader->uniform("frameBufSize", Vec2f(1024, 600));
 	gl::draw(deferred->getBufferTexture(DeferredRenderer::MIXED), Rectf(0.0f, 0.0f, (float)getWindowWidth(), (float)getWindowHeight()));
+	fxaaShader->unbind();
 
 	// Draw debug text.
 	gl::enableAlphaBlending();

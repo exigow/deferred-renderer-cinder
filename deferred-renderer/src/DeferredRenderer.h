@@ -60,13 +60,14 @@ public:
 		POSITION,
 		LIGHT,
 		ENVIRO,
-		MIXED
+		MIXED,
+		OUTPUT
 	};
 
 	gl::Texture getBufferTexture(BufferTexture texture);
 
 private:
-	gl::Fbo deferredFBO, lightFBO;
+	gl::Fbo deferredFBO, lightFBO, compositionFBO;
 
 	void setup(int width, int height);
 	CameraPersp *camera;
@@ -76,6 +77,7 @@ private:
 	CubeMap *cubeMap;
 
 	Area viewportPrev;
+	void drawScreenQuad();
 	
 	std::vector<PointLight*> lightList;
 	Timer tempTime;

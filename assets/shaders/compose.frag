@@ -20,5 +20,5 @@ void main() {
 	}
 	enviro.rgb += pow(fresnel, 4);
 	
-	gl_FragColor = vec4(enviro.rgb + light.rgb, 1);
+	gl_FragColor = vec4((enviro.rgb + light.rgb) * vec3(normal.a), 1);
 }
